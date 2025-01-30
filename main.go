@@ -3,14 +3,26 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/tucnak/telebot"
 )
 
+const TelegramBotTokenEnv = "TELEGRAM_BOT_TOKEN"
+
 func main() {
-	// Вставьте ваш токен, полученный от @BotFather
-	token := "7895240847:AAH9y2APPigER0JaHNlyz32V-uVw4SvwHuE"
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Ошибка загрузки .env файла")
+	}
+
+	token := os.Getenv(TelegramBotTokenEnv)
+	if token == "" {
+		log.Fatal("Токен не найден в переменных окружения")
+	}
 
 	// Создаем нового бота
 	bot, err := telebot.NewBot(telebot.Settings{
