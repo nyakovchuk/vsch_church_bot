@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/nyakovchuk/vsch_church_bot/config"
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/commands"
 	"github.com/tucnak/telebot"
 )
 
@@ -15,12 +16,13 @@ type SettingsBot interface {
 }
 
 type Bot struct {
-	bot    *telebot.Bot
-	config *config.Config
-	logger *slog.Logger
+	bot      *telebot.Bot
+	commands commands.CommandManager
+	config   *config.Config
+	logger   *slog.Logger
 }
 
-func NewBot(s SettingsBot) *Bot {
+func NewBot(s SettingsBot, commands commands.CommandManager) *Bot {
 
 	if s.Config().TelegramBotToken == "" {
 		s.Logger().Error("Retrieving the token", "err", "Token not found in environment variables")
@@ -39,10 +41,15 @@ func NewBot(s SettingsBot) *Bot {
 	}
 
 	return &Bot{
-		bot:    bot,
-		config: s.Config(),
-		logger: s.Logger(),
+		bot:      bot,
+		commands: commands.Get(),
+		config:   s.Config(),
+		logger:   s.Logger(),
 	}
+}
+
+func (b *Bot) Commands() commands.Commands {
+	return b.commands.Get()
 }
 
 func (b *Bot) Config() *config.Config {
