@@ -8,9 +8,9 @@ const (
 	OutputStart = "Привет! Я ваш Telegram-бот!!!"
 )
 
-func HandleStart(b Bot) func(m *telebot.Message) {
+func HandleStart(bm BotManager) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
-		b.LoggerInfo(m)
-		b.TBot().Send(m.Chat, OutputStart)
+		bm.LoggerInfo(m)
+		bm.TBot().Send(m.Chat, OutputStart)
 	}
 }

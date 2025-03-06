@@ -1,16 +1,25 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/tucnak/telebot"
 )
 
 const (
-	OutputHelp = "Введите команду, чтобы узнать, что я могу."
+	DescriptionText = "Доступны следующие команды:"
 )
 
-func HandleHelp(b Bot) func(m *telebot.Message) {
+func HandleHelp(bm BotManager) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
-		b.LoggerInfo(m)
-		b.TBot().Send(m.Chat, OutputHelp)
+		bm.LoggerInfo(m)
+
+		commandText := ""
+		for _, cmd := range bm.Commands().Get() {
+			commandText += cmd.Route + " - " + cmd.Description + "\n"
+		}
+
+		helpText := fmt.Sprintf("%s\n%s", DescriptionText, commandText)
+		bm.TBot().Send(m.Chat, helpText)
 	}
 }
