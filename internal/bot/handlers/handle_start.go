@@ -1,16 +1,17 @@
 package handlers
 
 import (
-	"github.com/tucnak/telebot"
+	"gopkg.in/telebot.v4"
 )
 
 const (
 	OutputStart = "Привет! Я ваш Telegram-бот!!!"
 )
 
-func HandleStart(bm BotManager) func(m *telebot.Message) {
-	return func(m *telebot.Message) {
-		bm.LoggerInfo(m)
-		bm.TBot().Send(m.Chat, OutputStart)
+func HandleStart(bm BotManager) func(telebot.Context) error {
+	return func(c telebot.Context) error {
+		bm.LoggerInfo(c)
+
+		return c.Send(OutputStart)
 	}
 }

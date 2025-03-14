@@ -5,13 +5,13 @@ import (
 
 	"github.com/nyakovchuk/vsch_church_bot/config"
 	"github.com/nyakovchuk/vsch_church_bot/internal/bot/commands"
-	"github.com/tucnak/telebot"
+	"gopkg.in/telebot.v4"
 )
 
 type BotManager interface {
 	Config() *config.Config
 	Logger() *slog.Logger
 	TBot() *telebot.Bot
-	LoggerInfo(m *telebot.Message)
+	LoggerInfo(telebot.Context)
 	Commands() commands.Commands
 }

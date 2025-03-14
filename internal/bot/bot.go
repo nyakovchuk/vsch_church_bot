@@ -7,7 +7,9 @@ import (
 
 	"github.com/nyakovchuk/vsch_church_bot/config"
 	"github.com/nyakovchuk/vsch_church_bot/internal/bot/commands"
-	"github.com/tucnak/telebot"
+
+	// "github.com/tucnak/telebot"
+	"gopkg.in/telebot.v4"
 )
 
 type SettingsBot interface {
