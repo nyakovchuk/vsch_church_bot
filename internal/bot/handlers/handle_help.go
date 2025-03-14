@@ -3,16 +3,16 @@ package handlers
 import (
 	"fmt"
 
-	"github.com/tucnak/telebot"
+	"gopkg.in/telebot.v4"
 )
 
 const (
 	DescriptionText = "Доступны следующие команды:"
 )
 
-func HandleHelp(bm BotManager) func(m *telebot.Message) {
-	return func(m *telebot.Message) {
-		bm.LoggerInfo(m)
+func HandleHelp(bm BotManager) func(telebot.Context) error {
+	return func(c telebot.Context) error {
+		bm.LoggerInfo(c)
 
 		commandText := ""
 		for _, cmd := range bm.Commands().Get() {
@@ -20,6 +20,7 @@ func HandleHelp(bm BotManager) func(m *telebot.Message) {
 		}
 
 		helpText := fmt.Sprintf("%s\n%s", DescriptionText, commandText)
-		bm.TBot().Send(m.Chat, helpText)
+
+		return c.Send(helpText)
 	}
 }

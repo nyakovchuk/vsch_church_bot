@@ -2,11 +2,11 @@ package bot
 
 import (
 	"github.com/nyakovchuk/vsch_church_bot/internal/bot/messages"
-	"github.com/tucnak/telebot"
+	"gopkg.in/telebot.v4"
 )
 
-func (b *Bot) LoggerInfo(m *telebot.Message) {
-	message := messages.Message{Tgmessage: m}
+func (b *Bot) LoggerInfo(c telebot.Context) {
+	message := messages.Message{Tgmessage: c}
 
 	b.logger.Info(message.Command(), "attrs", message.UserInfo())
 }
