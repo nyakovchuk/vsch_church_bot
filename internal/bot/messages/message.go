@@ -8,14 +8,29 @@ import (
 
 type Message struct {
 	Tgmessage telebot.Context
+	Service   CommandInfo
 }
 
-func (m *Message) UserInfo() string {
-	return fmt.Sprintf("from user: %s, Chat: %d", m.Tgmessage.Sender().Username, m.Tgmessage.Chat().ID)
+// New Message
+func NewMessage(tgmessage telebot.Context) Message {
+	service := GetTypeCommand(tgmessage)
+	return Message{
+		Tgmessage: tgmessage,
+		Service:   service,
+	}
 }
 
 func (m *Message) Command() string {
-	return fmt.Sprintf("Received %s command", m.Tgmessage.Text())
+	return m.Service.Command()
+}
+
+func (m *Message) Data() string {
+	cmd := GetTypeCommand(m.Tgmessage)
+	return cmd.Data()
+}
+
+func (m *Message) UserInfo() string {
+	return fmt.Sprintf("user: %s, chat: %d", m.Tgmessage.Sender().Username, m.Tgmessage.Chat().ID)
 }
 
 func (m *Message) FullInfo() string {

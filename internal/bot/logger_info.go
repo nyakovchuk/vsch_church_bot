@@ -6,7 +6,7 @@ import (
 )
 
 func (b *Bot) LoggerInfo(c telebot.Context) {
-	message := messages.Message{Tgmessage: c}
+	message := messages.NewMessage(c)
 
-	b.logger.Info(message.Command(), "attrs", message.UserInfo())
+	b.logger.Info(message.Command(), "data", message.Data(), "attrs", message.UserInfo())
 }

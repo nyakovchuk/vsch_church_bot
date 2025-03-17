@@ -11,6 +11,7 @@ type Commands []Command
 var commandList = Commands{
 	{"start", "/start", "Start the bot"},
 	{"help", "/help", "Get the help"},
+	{"location", "/location", "Set the location"},
 }
 
 func GetCommands() CommandManager {
