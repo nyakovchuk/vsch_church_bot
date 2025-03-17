@@ -1,0 +1,17 @@
+package buttons
+
+import "gopkg.in/telebot.v4"
+
+const (
+	btnText = "📍Отправить геолокацию"
+)
+
+func BtnLocation() *telebot.ReplyMarkup {
+
+	btn := &telebot.ReplyMarkup{ResizeKeyboard: true}
+	btnLocation := btn.Location(btnText)
+
+	btn.Reply(btn.Row(btnLocation))
+
+	return btn
+}

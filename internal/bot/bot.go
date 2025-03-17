@@ -69,6 +69,8 @@ func (b *Bot) TBot() *telebot.Bot {
 func (b *Bot) Run() {
 	b.Handlers()
 
+	b.Events()
+
 	fmt.Print("DONE\n")
 	b.bot.Start()
 }
