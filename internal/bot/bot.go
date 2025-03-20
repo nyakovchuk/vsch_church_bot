@@ -7,8 +7,7 @@ import (
 
 	"github.com/nyakovchuk/vsch_church_bot/config"
 	"github.com/nyakovchuk/vsch_church_bot/internal/bot/commands"
-
-	// "github.com/tucnak/telebot"
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/ui/menu"
 	"gopkg.in/telebot.v4"
 )
 
@@ -67,6 +66,9 @@ func (b *Bot) TBot() *telebot.Bot {
 }
 
 func (b *Bot) Run() {
+
+	menu.Create(b.bot)
+
 	b.Handlers()
 
 	b.Events()
