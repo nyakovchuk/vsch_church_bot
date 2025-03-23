@@ -1,10 +1,10 @@
-package events
+package handler
 
 import (
 	"log/slog"
 
 	"github.com/nyakovchuk/vsch_church_bot/config"
-	"github.com/nyakovchuk/vsch_church_bot/internal/bot/commands"
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/command"
 	"gopkg.in/telebot.v4"
 )
 
@@ -13,5 +13,5 @@ type BotManager interface {
 	Logger() *slog.Logger
 	TBot() *telebot.Bot
 	LoggerInfo(telebot.Context)
-	Commands() commands.Commands
+	Commands() command.Commands
 }

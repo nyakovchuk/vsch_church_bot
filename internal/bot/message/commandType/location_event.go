@@ -1,4 +1,4 @@
-package type_commands
+package commandType
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ func NewLocationEvent(tg telebot.Context) *LocationEvent {
 }
 
 func (m *LocationEvent) Command() string {
-	return "OnLocation event"
+	return "OnLocation"
 }
 
 func (m *LocationEvent) Data() string {

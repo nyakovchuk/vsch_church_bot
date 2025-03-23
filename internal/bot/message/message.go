@@ -1,4 +1,4 @@
-package messages
+package message
 
 import (
 	"fmt"
@@ -25,8 +25,9 @@ func (m *Message) Command() string {
 }
 
 func (m *Message) Data() string {
-	cmd := GetTypeCommand(m.Tgmessage)
-	return cmd.Data()
+	// cmd := GetTypeCommand(m.Tgmessage)
+	// return cmd.Data()
+	return m.Service.Data()
 }
 
 func (m *Message) UserInfo() string {

@@ -1,12 +1,12 @@
 package bot
 
 import (
-	"github.com/nyakovchuk/vsch_church_bot/internal/bot/messages"
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/message"
 	"gopkg.in/telebot.v4"
 )
 
 func (b *Bot) LoggerInfo(c telebot.Context) {
-	message := messages.NewMessage(c)
+	m := message.NewMessage(c)
 
-	b.logger.Info(message.Command(), "data", message.Data(), "attrs", message.UserInfo())
+	b.logger.Info(m.Data(), "type", m.Command(), "attrs", m.UserInfo())
 }
