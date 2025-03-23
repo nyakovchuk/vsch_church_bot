@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import (
 	"github.com/nyakovchuk/vsch_church_bot/internal/bot/ui/reply_buttons"

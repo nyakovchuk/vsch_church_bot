@@ -1,7 +1,8 @@
 package bot
 
-import "github.com/nyakovchuk/vsch_church_bot/internal/bot/events"
+import "github.com/nyakovchuk/vsch_church_bot/internal/bot/event"
 
 func (b *Bot) Events() {
-	events.HandleOnLocation(b)
+	event.HandleOnTextLocation(b)
+	event.HandleOnLocation(b)
 }

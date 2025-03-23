@@ -1,7 +1,7 @@
 package bot
 
 import (
-	"github.com/nyakovchuk/vsch_church_bot/internal/bot/handlers"
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/handler"
 	"github.com/nyakovchuk/vsch_church_bot/internal/bot/ui/inline_buttons"
 	"github.com/nyakovchuk/vsch_church_bot/internal/bot/ui/reply_buttons"
 	"gopkg.in/telebot.v4"
@@ -12,9 +12,9 @@ func (b *Bot) Handlers() {
 	commandHelp := b.Commands().GetByName("help")
 	commandLocation := b.Commands().GetByName("location")
 
-	b.bot.Handle(commandStart.Route, handlers.HandleStart(b))
-	b.bot.Handle(commandHelp.Route, handlers.HandleHelp(b))
-	b.bot.Handle(commandLocation.Route, handlers.HandleLocation(b))
+	b.bot.Handle(commandStart.Route, handler.HandleStart(b))
+	b.bot.Handle(commandHelp.Route, handler.HandleHelp(b))
+	b.bot.Handle(commandLocation.Route, handler.HandleLocation(b))
 
 	btns := inline_buttons.NewButtons()
 	b.bot.Handle("/inline_btns", func(c telebot.Context) error {

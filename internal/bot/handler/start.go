@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import (
 	"gopkg.in/telebot.v4"

@@ -1,4 +1,4 @@
-package messages
+package message
 
 type CommandInfo interface {
 	Command() string

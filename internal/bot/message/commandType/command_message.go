@@ -1,4 +1,4 @@
-package type_commands
+package commandType
 
 import "gopkg.in/telebot.v4"
 
@@ -11,9 +11,9 @@ func NewCommandMessage(tg telebot.Context) *CommandMessage {
 }
 
 func (m *CommandMessage) Command() string {
-	return "Received " + m.tg.Message().Text + " command"
+	return "Command"
 }
 
 func (m *CommandMessage) Data() string {
-	return ""
+	return m.tg.Message().Text
 }
