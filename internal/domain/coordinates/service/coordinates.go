@@ -4,6 +4,7 @@ import (
 	"errors"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 const coordPattern = `^(-?\d+\.\d+),?\s+(-?\d+\.\d+)$`
@@ -29,7 +30,7 @@ func ParseCoordinates(text string) (float64, float64, error) {
 
 func splitCoordinates(input string) (string, string, error) {
 	re := regexp.MustCompile(coordPattern)
-	matches := re.FindStringSubmatch(input)
+	matches := re.FindStringSubmatch(strings.TrimSpace(input))
 
 	if len(matches) != 3 {
 		return "", "", ErrInvalidCoordinatesFormat
