@@ -25,8 +25,6 @@ func (m *Message) Command() string {
 }
 
 func (m *Message) Data() string {
-	// cmd := GetTypeCommand(m.Tgmessage)
-	// return cmd.Data()
 	return m.Service.Data()
 }
 

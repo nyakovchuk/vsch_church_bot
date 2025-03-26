@@ -10,6 +10,9 @@ func GetTypeCommand(bot telebot.Context) CommandInfo {
 	case bot.Message().Location != nil:
 		le := ct.NewLocationEvent(bot)
 		return le
+	case bot.Callback() != nil:
+		le := ct.NewCallbackEvent(bot)
+		return le
 	case isTextMessage(bot.Message().Text):
 		te := ct.NewTextEvent(bot)
 		return te
