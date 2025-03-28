@@ -13,9 +13,9 @@ func NewButtonSet() *button.ButtonSet {
 	return &button.ButtonSet{
 		Order: Order(),
 		Buttons: map[string]button.ButtonConfig{
-			"five":   {"5 км", "radius_five"},
-			"ten":    {"10 км", "radius_ten"},
-			"thirty": {"30 км", "radius_thirty"},
+			"five":   {Label: "5 км", Data: "radius_five"},
+			"ten":    {Label: "10 км", Data: "radius_ten"},
+			"thirty": {Label: "30 км", Data: "radius_thirty"},
 		},
 	}
 }
