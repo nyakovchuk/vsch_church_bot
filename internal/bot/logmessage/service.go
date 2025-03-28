@@ -1,7 +1,7 @@
-package message
+package logmessage
 
 import (
-	ct "github.com/nyakovchuk/vsch_church_bot/internal/bot/message/commandType"
+	ct "github.com/nyakovchuk/vsch_church_bot/internal/bot/logmessage/commandType"
 	"gopkg.in/telebot.v4"
 )
 
@@ -9,6 +9,9 @@ func GetTypeCommand(bot telebot.Context) CommandInfo {
 	switch {
 	case bot.Message().Location != nil:
 		le := ct.NewLocationEvent(bot)
+		return le
+	case bot.Callback() != nil:
+		le := ct.NewCallbackEvent(bot)
 		return le
 	case isTextMessage(bot.Message().Text):
 		te := ct.NewTextEvent(bot)

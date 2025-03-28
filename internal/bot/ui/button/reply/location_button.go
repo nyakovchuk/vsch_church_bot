@@ -1,4 +1,4 @@
-package reply_buttons
+package reply
 
 import "gopkg.in/telebot.v4"
 

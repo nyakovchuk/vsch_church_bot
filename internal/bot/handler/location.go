@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/nyakovchuk/vsch_church_bot/internal/bot/ui/reply_buttons"
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/ui/button/reply"
 	"gopkg.in/telebot.v4"
 )
 
@@ -13,7 +13,7 @@ func HandleLocation(bm BotManager) func(telebot.Context) error {
 	return func(c telebot.Context) error {
 		bm.LoggerInfo(c)
 
-		btn := reply_buttons.BtnLocation()
+		btn := reply.BtnLocation()
 
 		return c.Send(commandText, btn)
 	}

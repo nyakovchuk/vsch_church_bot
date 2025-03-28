@@ -1,4 +1,4 @@
-package message
+package logmessage
 
 import (
 	"fmt"
@@ -6,34 +6,32 @@ import (
 	"gopkg.in/telebot.v4"
 )
 
-type Message struct {
+type LogMessage struct {
 	Tgmessage telebot.Context
 	Service   CommandInfo
 }
 
 // New Message
-func NewMessage(tgmessage telebot.Context) Message {
+func New(tgmessage telebot.Context) LogMessage {
 	service := GetTypeCommand(tgmessage)
-	return Message{
+	return LogMessage{
 		Tgmessage: tgmessage,
 		Service:   service,
 	}
 }
 
-func (m *Message) Command() string {
+func (m *LogMessage) Command() string {
 	return m.Service.Command()
 }
 
-func (m *Message) Data() string {
-	// cmd := GetTypeCommand(m.Tgmessage)
-	// return cmd.Data()
+func (m *LogMessage) Data() string {
 	return m.Service.Data()
 }
 
-func (m *Message) UserInfo() string {
+func (m *LogMessage) UserInfo() string {
 	return fmt.Sprintf("user: %s, chat: %d", m.Tgmessage.Sender().Username, m.Tgmessage.Chat().ID)
 }
 
-func (m *Message) FullInfo() string {
+func (m *LogMessage) FullInfo() string {
 	return m.Command() + " " + m.UserInfo()
 }
