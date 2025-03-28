@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/ui/button/inline/radiusBtn"
 	"gopkg.in/telebot.v4"
 )
 
@@ -13,17 +14,7 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 
 		radiusText := strings.TrimSpace(c.Callback().Data)
 
-		var radius int
-		switch radiusText {
-		case "radius_five":
-			radius = 5
-		case "radius_ten":
-			radius = 10
-		case "radius_thirty":
-			radius = 30
-		default:
-			radius = 10
-		}
+		radius := getRadius(radiusText)
 
 		c.Respond()
 
@@ -45,4 +36,24 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 
 		return c.Send(text1)
 	})
+}
+
+func getRadius(key string) int {
+
+	buttons := radiusBtn.NewButtonSet()
+
+	var radius int
+
+	switch key {
+	case buttons.Buttons["five"].Data:
+		radius = 5
+	case buttons.Buttons["ten"].Data:
+		radius = 10
+	case buttons.Buttons["thirty"].Data:
+		radius = 30
+	default:
+		radius = 10
+	}
+
+	return radius
 }

@@ -5,33 +5,51 @@ import (
 	"gopkg.in/telebot.v4"
 )
 
+func Order() []string {
+	return []string{"five", "ten", "thirty"}
+}
+
+func NewButtonSet() *button.ButtonSet {
+	return &button.ButtonSet{
+		Order: Order(),
+		Buttons: map[string]button.ButtonConfig{
+			"five":   {"5 км", "radius_five"},
+			"ten":    {"10 км", "radius_ten"},
+			"thirty": {"30 км", "radius_thirty"},
+		},
+	}
+}
+
 type RadiusButtons struct {
-	IButtons *button.Btn
+	IButtons  *button.Btn
+	ButtonSet *button.ButtonSet
 }
 
 func New() *RadiusButtons {
 	return &RadiusButtons{
-		IButtons: button.NewButtons(),
+		IButtons:  button.NewButtons(),
+		ButtonSet: NewButtonSet(),
 	}
 }
 
 func (rb *RadiusButtons) Display() *telebot.ReplyMarkup {
-	rb.create()
+	row := rb.create()
 
 	rb.IButtons.Reply.Inline(
-		rb.IButtons.Reply.Row(
-			rb.IButtons.Buttons["five"],
-			rb.IButtons.Buttons["ten"],
-			rb.IButtons.Buttons["thirty"],
-		),
+		rb.IButtons.Reply.Row(row...),
 	)
 
 	return rb.IButtons.Reply
 }
 
-func (rb *RadiusButtons) create() {
-	rb.IButtons.Buttons["five"] = rb.IButtons.Reply.Data("5 км", "radius_five")
-	rb.IButtons.Buttons["ten"] = rb.IButtons.Reply.Data("10 км", "radius_ten")
-	rb.IButtons.Buttons["thirty"] = rb.IButtons.Reply.Data("30 км", "radius_thirty")
+func (rb *RadiusButtons) create() []telebot.Btn {
+	var row []telebot.Btn
+	for _, key := range rb.ButtonSet.Order {
+		btn := rb.ButtonSet.Buttons[key]
+		rb.IButtons.Buttons[key] = rb.IButtons.Reply.Data(btn.Label, btn.Data)
 
+		row = append(row, rb.IButtons.Buttons[key])
+	}
+
+	return row
 }

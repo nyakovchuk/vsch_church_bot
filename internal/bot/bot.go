@@ -73,6 +73,6 @@ func (b *Bot) Run() {
 
 	b.Events()
 
-	fmt.Print("DONE\n")
+	fmt.Print("DONE\n\n")
 	b.bot.Start()
 }
