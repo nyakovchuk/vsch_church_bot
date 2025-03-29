@@ -1,18 +1,23 @@
 package app
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"log/slog"
 	"sync"
 
 	"github.com/nyakovchuk/vsch_church_bot/config"
+	"github.com/nyakovchuk/vsch_church_bot/internal/db"
 	"github.com/nyakovchuk/vsch_church_bot/internal/logger"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type App struct {
 	config *config.Config
 	logger *slog.Logger
+	db     *sql.DB
 }
 
 // Singleton
@@ -29,10 +34,15 @@ func (a *App) Logger() *slog.Logger {
 	return a.logger
 }
 
-func NewApp(config *config.Config, logger *slog.Logger) *App {
+func (a *App) DB() *sql.DB {
+	return a.db
+}
+
+func NewApp(config *config.Config, logger *slog.Logger, db *sql.DB) *App {
 	return &App{
 		config: config,
 		logger: logger,
+		db:     db,
 	}
 }
 
@@ -55,7 +65,15 @@ func GetApp() *App {
 		}
 		fmt.Println("DONE")
 
-		instance = NewApp(config, logger)
+		fmt.Print("Connecting to database...")
+		db, err := db.ConnectDB()
+		if err != nil {
+			fmt.Println("Error connecting to database:", err)
+		}
+		defer db.Close()
+		fmt.Println("DONE")
+
+		instance = NewApp(config, logger, db)
 	})
 
 	if instance == nil {
