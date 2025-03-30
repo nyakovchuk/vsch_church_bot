@@ -66,7 +66,7 @@ func GetApp() *App {
 		fmt.Println("DONE")
 
 		fmt.Print("Connecting to database...")
-		db, err := db.ConnectDB()
+		db, err := db.ConnectDB(config)
 		if err != nil {
 			fmt.Println("Error connecting to database:", err)
 		}
