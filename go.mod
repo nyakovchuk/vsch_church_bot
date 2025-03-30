@@ -10,6 +10,8 @@ require (
 
 require github.com/paulmach/orb v0.11.1
 
+require github.com/mattn/go-sqlite3 v1.14.24
+
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
