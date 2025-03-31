@@ -14,7 +14,13 @@ var (
 	ErrInvalidCoordinatesTransformation = errors.New("ошибка преобразования координат")
 )
 
-func ParseCoordinates(text string) (float64, float64, error) {
+type CoordinatesService struct{}
+
+func NewCoordinatesService() *CoordinatesService {
+	return &CoordinatesService{}
+}
+
+func (c CoordinatesService) ParseCoordinates(text string) (float64, float64, error) {
 	latStr, lonStr, err := splitCoordinates(text)
 	if err != nil {
 		return 0, 0, err
