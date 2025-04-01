@@ -6,15 +6,15 @@ import (
 )
 
 type Service struct {
-	CoordinatesService coordinates.CoordinatesService
-	DistanceService    coordinates.DistanceService
+	Coordinates coordinates.CoordinatesService
+	Distance    coordinates.DistanceService
 }
 
 func New(repo *repository.Repository) *Service {
-	distanceService := coordinates.NewDistanceService(repo.CoordinatesRepository)
+	distanceService := coordinates.NewDistanceService(repo.DistanceRepository)
 	coordinatesService := coordinates.NewCoordinatesService()
 	return &Service{
-		DistanceService:    *distanceService,
-		CoordinatesService: *coordinatesService,
+		Distance:    *distanceService,
+		Coordinates: *coordinatesService,
 	}
 }

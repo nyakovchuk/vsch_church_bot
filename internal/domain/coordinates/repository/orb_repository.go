@@ -8,7 +8,7 @@ import (
 
 type CoordinatesOrbRepository struct{}
 
-func NewOrbRepository() CoordinatesRepository {
+func NewOrbRepository() DistanceRepository {
 	return &CoordinatesOrbRepository{}
 }
 

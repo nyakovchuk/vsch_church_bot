@@ -5,6 +5,9 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/dto"
+	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/model"
 )
 
 const coordPattern = `^(-?\d+\.\d+),?\s+(-?\d+\.\d+)$`
@@ -20,18 +23,23 @@ func NewCoordinatesService() *CoordinatesService {
 	return &CoordinatesService{}
 }
 
-func (c CoordinatesService) ParseCoordinates(text string) (float64, float64, error) {
+func (c CoordinatesService) ParseCoordinates(text string) (model.Coordinates, error) {
 	latStr, lonStr, err := splitCoordinates(text)
 	if err != nil {
-		return 0, 0, err
+		return model.Coordinates{}, err
 	}
 
 	lat, lon, err := parseFloats(latStr, lonStr)
 	if err != nil {
-		return 0, 0, err
+		return model.Coordinates{}, err
 	}
 
-	return lat, lon, nil
+	coordinates := dto.CoordinatesToModel(lat, lon)
+	if err := coordinates.Validate(); err != nil {
+		return model.Coordinates{}, err
+	}
+
+	return coordinates, nil
 }
 
 func splitCoordinates(input string) (string, string, error) {

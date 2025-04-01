@@ -35,10 +35,10 @@ func TestParseCoordinates(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.input, func(t *testing.T) {
-			gotLat, gotLon, err := service.ParseCoordinates(tc.input)
+			gotCoordinates, err := service.ParseCoordinates(tc.input)
 
 			if tc.wantSuccess && err != nil {
-				t.Errorf("ParseCoordinates(%q) = (%f, %f),  error = %v", tc.input, gotLat, gotLon, err)
+				t.Errorf("ParseCoordinates(%q) = (%f, %f),  error = %v", tc.input, gotCoordinates.Latitude, gotCoordinates.Longitude, err)
 			}
 
 			if !tc.wantSuccess {

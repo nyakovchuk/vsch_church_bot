@@ -10,14 +10,15 @@ func HandleOnTextLocation(bm BotManager, cache map[string]interface{}, radiusBtn
 	bm.TBot().Handle(telebot.OnText, func(c telebot.Context) error {
 		bm.LoggerInfo(c)
 
-		// 1) преобразовать текст в координаты
-		lat, lon, err := bm.Services().CoordinatesService.ParseCoordinates(c.Message().Text)
+		coordinates, err := bm.Services().Coordinates.ParseCoordinates(c.Message().Text)
 		if err != nil {
 			return c.Send(err.Error())
 		}
 
-		cache["latitude"] = lat
-		cache["longitude"] = lon
+		// записать в БД
+		// bm.Services().Coordinates.Create(lat, lon)
+		cache["latitude"] = coordinates.Latitude
+		cache["longitude"] = coordinates.Longitude
 
 		return c.Reply("Найти ближайшие церкви в радиусе:", radiusBtn.Display())
 	})

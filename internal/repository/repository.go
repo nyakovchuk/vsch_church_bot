@@ -7,12 +7,12 @@ import (
 )
 
 type Repository struct {
-	CoordinatesRepository repository.CoordinatesRepository
+	DistanceRepository repository.DistanceRepository
 }
 
 func New(db *sql.DB) *Repository {
 	return &Repository{
-		CoordinatesRepository: repository.NewOrbRepository(),
+		DistanceRepository: repository.NewOrbRepository(),
 	}
 }
 
