@@ -14,6 +14,7 @@ func main() {
 
 	app := app.GetApp()
 	fmt.Printf("Logging mode: %s\n\n", app.Config().LogType)
+	defer app.DB().Close()
 
 	cmds := command.GetCommands()
 

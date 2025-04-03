@@ -12,9 +12,9 @@ type Service struct {
 
 func New(repo *repository.Repository) *Service {
 	distanceService := coordinates.NewDistanceService(repo.DistanceRepository)
-	coordinatesService := coordinates.NewCoordinatesService()
+	coordinatesService := coordinates.NewCoordinatesService(repo.CoordinatesRepository)
 	return &Service{
-		Distance:    *distanceService,
-		Coordinates: *coordinatesService,
+		Distance:    distanceService,
+		Coordinates: coordinatesService,
 	}
 }

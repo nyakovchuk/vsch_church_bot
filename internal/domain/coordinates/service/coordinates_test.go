@@ -31,7 +31,7 @@ func TestParseCoordinates(t *testing.T) {
 		{"123.45", false, service.ErrInvalidCoordinatesFormat},              // Только одно число
 	}
 
-	service := service.NewCoordinatesService()
+	service := service.NewCoordinatesService(nil)
 
 	for _, tc := range tests {
 		t.Run(tc.input, func(t *testing.T) {
