@@ -2,3 +2,4 @@ create_bot.txt
 bot.json.log
 .env
 db.sqlite
+bin/
