@@ -3,11 +3,11 @@
 CREATE TABLE languages (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    abbr TEXT NOT NULL UNIQUE
+    code TEXT NOT NULL UNIQUE
 );
 
-INSERT OR IGNORE INTO languages (name, abbr) VALUES 
-    ('Українська', 'ua'),
+INSERT OR IGNORE INTO languages (name, code) VALUES 
+    ('Українська', 'uk'),
     ('Русский', 'ru'),
     ('English', 'en');
 -- +goose StatementEnd

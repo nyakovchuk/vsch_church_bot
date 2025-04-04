@@ -76,6 +76,8 @@ func (b *Bot) Run() {
 
 	menu.Create(b.bot)
 
+	b.Middleware()
+
 	b.Handlers()
 
 	b.Events()
