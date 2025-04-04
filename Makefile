@@ -25,5 +25,8 @@ migration-down:
 migration-down-to:
 	$(LOCAL_BIN)/goose -dir $(MIGRATION_DIR) $(DB_DRIVER) down-to $(ARGUMENTS)
 
+migration-fresh:
+	$(LOCAL_BIN)/goose -dir $(MIGRATION_DIR) $(DB_DRIVER) down-to 0
+
 #%::
 #	@true
