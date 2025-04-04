@@ -22,6 +22,8 @@ func HandleOnLocation(bm BotManager, cache map[string]interface{}, radiusBtn But
 
 		coords := model.FromCoordinates(float64(location.Lat), float64(location.Lng))
 
+		// добавить username
+		// user.SaveCoordinates(ctx, username, coords)
 		savedCoords, err := bm.Services().Coordinates.Save(context.Background(), coords)
 		if err != nil {
 			return c.Send(err.Error())

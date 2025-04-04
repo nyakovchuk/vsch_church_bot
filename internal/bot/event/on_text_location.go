@@ -1,6 +1,9 @@
 package event
 
 import (
+	"context"
+	"fmt"
+
 	"gopkg.in/telebot.v4"
 )
 
@@ -10,15 +13,22 @@ func HandleOnTextLocation(bm BotManager, cache map[string]interface{}, radiusBtn
 	bm.TBot().Handle(telebot.OnText, func(c telebot.Context) error {
 		bm.LoggerInfo(c)
 
-		coordinates, err := bm.Services().Coordinates.ParseCoordinates(c.Message().Text)
+		coords, err := bm.Services().Coordinates.ParseCoordinates(c.Message().Text)
 		if err != nil {
 			return c.Send(err.Error())
 		}
 
+		savedCoords, err := bm.Services().Coordinates.Save(context.Background(), coords)
+		if err != nil {
+			return c.Send(err.Error())
+		}
+
+		_ = fmt.Sprintf("Ваши кординаты: %f, %f", savedCoords.Latitude, savedCoords.Longitude)
+
 		// записать в БД
 		// bm.Services().Coordinates.Create(lat, lon)
-		cache["latitude"] = coordinates.Latitude
-		cache["longitude"] = coordinates.Longitude
+		// cache["latitude"] = savedCoords.Latitude
+		// cache["longitude"] = savedCoords.Longitude
 
 		return c.Reply("Найти ближайшие церкви в радиусе:", radiusBtn.Display())
 	})

@@ -29,7 +29,6 @@ func NewCoordinatesRepository(db *sql.DB) *coordinatesRepository {
 func (r *coordinatesRepository) Save(ctx context.Context, coords *dto.RepositoryCoordinates) (*dto.RepositoryCoordinates, error) {
 	coords.CreatedAt = time.Now().UTC()
 
-	// Строим запрос с помощью goqu
 	ds := goqu.Insert("coordinates").
 		Rows(goqu.Record{
 			"latitude":   coords.Latitude,
@@ -38,11 +37,12 @@ func (r *coordinatesRepository) Save(ctx context.Context, coords *dto.Repository
 		}).
 		Returning("id")
 
-	// Получаем SQL и аргументы
 	sqlQuery, args, err := ds.ToSQL()
 	if err != nil {
 		return nil, err
 	}
+
+	// Написать ещё два запроса для таблицы user, telegram и coordinates_history,
 
 	// Выполняем через стандартный sql.DB
 	tx, err := r.db.BeginTx(ctx, nil)
@@ -65,7 +65,6 @@ func (r *coordinatesRepository) Save(ctx context.Context, coords *dto.Repository
 	return coords, nil
 }
 
-// Пример метода для получения данных
 func (r *coordinatesRepository) GetByID(ctx context.Context, id int) (*dto.RepositoryCoordinates, error) {
 	ds := goqu.From("coordinates").
 		Select("id", "latitude", "longitude", "created_at").
