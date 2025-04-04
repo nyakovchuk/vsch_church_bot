@@ -1,8 +1,10 @@
 package event
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/model"
 	"gopkg.in/telebot.v4"
 )
 
@@ -15,11 +17,19 @@ func HandleOnLocation(bm BotManager, cache map[string]interface{}, radiusBtn But
 			return c.Send("Не удалось получить геолокацию.")
 		}
 
-		// записать в БД
-		cache["latitude"] = float64(location.Lat)
-		cache["longitude"] = float64(location.Lng)
+		// cache["latitude"] = float64(location.Lat)
+		// cache["longitude"] = float64(location.Lng)
 
-		text := fmt.Sprintf("Ваши кординаты: %f, %f", location.Lat, location.Lng)
+		coords := model.FromCoordinates(float64(location.Lat), float64(location.Lng))
+
+		// добавить username
+		// user.SaveCoordinates(ctx, username, coords)
+		savedCoords, err := bm.Services().Coordinates.Save(context.Background(), coords)
+		if err != nil {
+			return c.Send(err.Error())
+		}
+
+		text := fmt.Sprintf("Ваши кординаты: %f, %f", savedCoords.Latitude, savedCoords.Longitude)
 		c.Send(text)
 
 		return c.Reply("Найти ближайшие церкви в радиусе:", radiusBtn.Display())

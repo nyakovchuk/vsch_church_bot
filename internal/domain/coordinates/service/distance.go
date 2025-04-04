@@ -3,18 +3,23 @@ package service
 import (
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/dto"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/model"
+	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/repository"
 )
 
-type DistanceService struct {
-	repo DistanceManager
+type DistanceService interface {
+	GetChurchesNearby(latitude, longitude, radius float64) (int, error)
+}
+
+type distanceService struct {
+	repo repository.DistanceRepository
 }
 
 // NewShopService создает новый сервис магазинов.
-func NewDistanceService(repo DistanceManager) *DistanceService {
-	return &DistanceService{repo: repo}
+func NewDistanceService(repo repository.DistanceRepository) DistanceService {
+	return &distanceService{repo: repo}
 }
 
-func (s *DistanceService) GetChurchesNearby(latitude, longitude, radius float64) (int, error) {
+func (s *distanceService) GetChurchesNearby(latitude, longitude, radius float64) (int, error) {
 
 	coordinates := dto.CoordinatesToModel(latitude, longitude)
 	if err := coordinates.Validate(); err != nil {
@@ -37,7 +42,7 @@ func (s *DistanceService) GetChurchesNearby(latitude, longitude, radius float64)
 }
 
 // GetShopsNearby ищет магазины в радиусе X км.
-func (s *DistanceService) distance(coordinates1, coordinates2 model.Coordinates) (float64, error) {
+func (s *distanceService) distance(coordinates1, coordinates2 model.Coordinates) (float64, error) {
 
 	distance := s.repo.Distance(coordinates1, coordinates2)
 

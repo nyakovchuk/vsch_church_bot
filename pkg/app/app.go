@@ -70,7 +70,6 @@ func GetApp() *App {
 		if err != nil {
 			fmt.Println("Error connecting to database:", err)
 		}
-		defer db.Close()
 		fmt.Println("DONE")
 
 		instance = NewApp(config, logger, db)

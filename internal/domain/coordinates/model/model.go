@@ -13,6 +13,13 @@ type Coordinates struct {
 	Longitude float64
 }
 
+func FromCoordinates(latitude, longitude float64) Coordinates {
+	return Coordinates{
+		Latitude:  latitude,
+		Longitude: longitude,
+	}
+}
+
 func (c *Coordinates) Validate() error {
 	if c.Latitude < -90 || c.Latitude > 90 {
 		return ErrCorrectLatitude

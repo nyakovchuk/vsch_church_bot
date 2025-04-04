@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"regexp"
 	"strconv"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/dto"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/model"
+	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/repository"
 )
 
 const coordPattern = `^(-?\d+\.\d+),?\s+(-?\d+\.\d+)$`
@@ -17,13 +19,50 @@ var (
 	ErrInvalidCoordinatesTransformation = errors.New("ошибка преобразования координат")
 )
 
-type CoordinatesService struct{}
-
-func NewCoordinatesService() *CoordinatesService {
-	return &CoordinatesService{}
+type CoordinatesService interface {
+	ParseCoordinates(string) (model.Coordinates, error)
+	Save(context.Context, model.Coordinates) (model.Coordinates, error)
+	GetCoordinates(context.Context, int) (model.Coordinates, error)
 }
 
-func (c CoordinatesService) ParseCoordinates(text string) (model.Coordinates, error) {
+type coordinatesService struct {
+	repo repository.CoordinatesRepository
+}
+
+func NewCoordinatesService(repo repository.CoordinatesRepository) CoordinatesService {
+	return &coordinatesService{
+		repo: repo,
+	}
+}
+
+func (c *coordinatesService) Save(ctx context.Context, coords model.Coordinates) (model.Coordinates, error) {
+	if err := coords.Validate(); err != nil {
+		return model.Coordinates{}, err
+	}
+
+	repoDTO := &dto.RepositoryCoordinates{
+		Latitude:  coords.Latitude,
+		Longitude: coords.Longitude,
+	}
+
+	repoCoords, err := c.repo.Save(ctx, repoDTO)
+	if err != nil {
+		return model.Coordinates{}, err
+	}
+
+	return dto.ToModel(*repoCoords), nil
+}
+
+func (c *coordinatesService) GetCoordinates(ctx context.Context, id int) (model.Coordinates, error) {
+	repoCoords, err := c.repo.GetByID(ctx, id)
+	if err != nil {
+		return model.Coordinates{}, err
+	}
+
+	return dto.ToModel(*repoCoords), nil
+}
+
+func (c *coordinatesService) ParseCoordinates(text string) (model.Coordinates, error) {
 	latStr, lonStr, err := splitCoordinates(text)
 	if err != nil {
 		return model.Coordinates{}, err
