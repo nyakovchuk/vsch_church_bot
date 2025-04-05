@@ -42,6 +42,8 @@ func (r *coordinatesRepository) Save(ctx context.Context, coords *dto.Repository
 		return nil, err
 	}
 
+	// сохранить в users coordinates_id
+
 	// Написать ещё два запроса для таблицы user, telegram и coordinates_history,
 
 	// Выполняем через стандартный sql.DB

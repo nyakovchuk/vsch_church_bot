@@ -13,7 +13,7 @@ type Coordinates struct {
 	Longitude float64
 }
 
-func FromCoordinates(latitude, longitude float64) Coordinates {
+func ToCoordinates(latitude, longitude float64) Coordinates {
 	return Coordinates{
 		Latitude:  latitude,
 		Longitude: longitude,
