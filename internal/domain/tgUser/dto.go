@@ -1,7 +1,6 @@
 package tgUser
 
 type DtoRepository struct {
-	ID           int    `db:"id"`
 	TgID         int64  `db:"tg_id"`
 	Username     string `db:"username"`
 	FirstName    string `db:"first_name"`

@@ -67,7 +67,7 @@ func (r *repository) createTelegramUser(ctx context.Context, tx *sql.Tx, dtoTgUs
 			"is_bot":        dtoTgUser.IsBot,
 			"is_premium":    dtoTgUser.IsPremium,
 		}).
-		Returning("id")
+		Returning("tg_id")
 
 	sqlQuery, args, err := ds.ToSQL()
 	if err != nil {

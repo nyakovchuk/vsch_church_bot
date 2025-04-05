@@ -3,7 +3,6 @@ package tgUser
 import "gopkg.in/telebot.v4"
 
 type TgUser struct {
-	ID           int64
 	TgID         int64
 	Username     string
 	FirstName    string

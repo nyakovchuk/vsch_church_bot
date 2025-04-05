@@ -7,7 +7,7 @@ CREATE TABLE users (
     lang_id INTEGER,
     radius INTEGER,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (telegram_users_id) REFERENCES telegram_users(id) ON DELETE CASCADE
+    FOREIGN KEY (telegram_users_id) REFERENCES telegram_users(tg_id) ON DELETE CASCADE
         ON UPDATE CASCADE,
     FOREIGN KEY (coordinates_id) REFERENCES coordinates(id) ON DELETE CASCADE
         ON UPDATE CASCADE,

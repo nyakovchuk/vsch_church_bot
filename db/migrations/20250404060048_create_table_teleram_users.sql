@@ -1,8 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE telegram_users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    tg_id INTEGER NOT NULL,
+    tg_id INTEGER PRIMARY KEY,
     username TEXT NOT NULL,
     first_name TEXT DEFAULT "",
     last_name TEXT DEFAULT "",
