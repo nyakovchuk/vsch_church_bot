@@ -33,6 +33,7 @@ func (r *coordinatesRepository) Save(ctx context.Context, coords *dto.Repository
 		Rows(goqu.Record{
 			"latitude":   coords.Latitude,
 			"longitude":  coords.Longitude,
+			"is_on_text": coords.IsOnText,
 			"created_at": coords.CreatedAt,
 		}).
 		Returning("id")

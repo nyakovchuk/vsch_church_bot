@@ -9,14 +9,16 @@ var (
 
 type Coordinates struct {
 	ID        int
+	IsOnText  bool
 	Latitude  float64
 	Longitude float64
 }
 
-func ToCoordinates(latitude, longitude float64) Coordinates {
+func ToCoordinates(latitude, longitude float64, isOnText bool) Coordinates {
 	return Coordinates{
 		Latitude:  latitude,
 		Longitude: longitude,
+		IsOnText:  isOnText,
 	}
 }
 

@@ -22,7 +22,7 @@ func HandleOnLocation(bm BotManager, cache map[string]interface{}, radiusBtn But
 		// cache["latitude"] = float64(location.Lat)
 		// cache["longitude"] = float64(location.Lng)
 
-		coords := model.ToCoordinates(float64(location.Lat), float64(location.Lng))
+		coords := model.ToCoordinates(float64(location.Lat), float64(location.Lng), false)
 
 		// добавить username
 		// user.SaveCoordinates(ctx, username, coords)

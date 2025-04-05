@@ -10,6 +10,7 @@ type RepositoryCoordinates struct {
 	ID        int       `db:"id"`
 	Latitude  float64   `db:"latitude"`
 	Longitude float64   `db:"longitude"`
+	IsOnText  bool      `db:"is_on_text"`
 	CreatedAt time.Time `db:"created_at"`
 }
 
@@ -18,6 +19,7 @@ func ToModel(repoCoords RepositoryCoordinates) model.Coordinates {
 		ID:        repoCoords.ID,
 		Latitude:  repoCoords.Latitude,
 		Longitude: repoCoords.Longitude,
+		IsOnText:  repoCoords.IsOnText,
 	}
 }
 
