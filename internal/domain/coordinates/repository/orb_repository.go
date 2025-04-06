@@ -6,13 +6,17 @@ import (
 	"github.com/paulmach/orb/geo"
 )
 
-type CoordinatesOrbRepository struct{}
-
-func NewOrbRepository() DistanceRepository {
-	return &CoordinatesOrbRepository{}
+type DistanceRepository interface {
+	Distance(p1, p2 model.Coordinates) float64
 }
 
-func (c *CoordinatesOrbRepository) Distance(p1, p2 model.Coordinates) float64 {
+type coordinatesOrbRepository struct{}
+
+func NewOrbRepository() DistanceRepository {
+	return &coordinatesOrbRepository{}
+}
+
+func (c *coordinatesOrbRepository) Distance(p1, p2 model.Coordinates) float64 {
 
 	p1DTO := dto.ModelToOrb(p1)
 	p2DTO := dto.ModelToOrb(p2)

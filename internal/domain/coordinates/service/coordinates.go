@@ -43,6 +43,7 @@ func (c *coordinatesService) Save(ctx context.Context, coords model.Coordinates)
 	repoDTO := &dto.RepositoryCoordinates{
 		Latitude:  coords.Latitude,
 		Longitude: coords.Longitude,
+		IsOnText:  coords.IsOnText,
 	}
 
 	repoCoords, err := c.repo.Save(ctx, repoDTO)
