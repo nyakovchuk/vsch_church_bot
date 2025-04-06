@@ -51,7 +51,7 @@ func (c *coordinatesService) Save(ctx context.Context, coords model.Coordinates)
 		return model.Coordinates{}, err
 	}
 
-	return dto.ToModel(*repoCoords), nil
+	return dto.ToModel(repoCoords), nil
 }
 
 func (c *coordinatesService) GetCoordinates(ctx context.Context, id int) (model.Coordinates, error) {
