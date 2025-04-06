@@ -1,7 +1,7 @@
 package tgUser
 
 type Service interface {
-	CheckTgId(tgId int64) bool
+	CheckTgId(tgId int64) (bool, error)
 }
 
 type service struct {
@@ -14,10 +14,15 @@ func NewService(repository Repository) Service {
 	}
 }
 
-func (s *service) CheckTgId(tgId int64) bool {
+func (s *service) CheckTgId(tgId int64) (bool, error) {
 	exist, err := s.repo.CheckTgId(tgId)
-	if err != nil || !exist {
-		return false
+	if err != nil {
+		return false, err
 	}
-	return true
+
+	if !exist {
+		return false, nil
+	}
+
+	return true, nil
 }

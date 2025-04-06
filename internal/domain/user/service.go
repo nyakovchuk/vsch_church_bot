@@ -7,7 +7,7 @@ import (
 )
 
 type Service interface {
-	CreateUser(context.Context, tgUser.TgUser) bool
+	Register(context.Context, tgUser.TgUser) error
 }
 
 type service struct {
@@ -20,13 +20,13 @@ func NewService(repository Repository) Service {
 	}
 }
 
-func (s *service) CreateUser(ctx context.Context, modelTgUser tgUser.TgUser) bool {
+func (s *service) Register(ctx context.Context, modelTgUser tgUser.TgUser) error {
 
 	repoTgUserDto := tgUser.ModelToDto(modelTgUser)
 
-	if err := s.repo.CreateUser(ctx, repoTgUserDto); err != nil {
-		return false
+	if err := s.repo.RegisterUser(ctx, repoTgUserDto); err != nil {
+		return err
 	}
 
-	return true
+	return nil
 }

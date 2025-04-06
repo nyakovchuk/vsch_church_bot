@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/tgUser"
 	"gopkg.in/telebot.v4"
@@ -13,14 +12,12 @@ func CheckUser(bm BotManager) {
 		return func(c telebot.Context) error {
 			user := c.Sender()
 
-			fmt.Println("middleware.CheckUser:", user.Username)
-
-			// 1) проверить, что юзер есть в БД
-			if notExistsUser(bm, user.ID) {
+			if unregisteredUser(bm, user.ID) {
 				tgUserModel := tgUser.ToModel(user)
-				bm.Services().User.CreateUser(context.Background(), tgUserModel)
-				// 2) если юзера нет в БД, то создать
-
+				err := bm.Services().User.Register(context.Background(), tgUserModel)
+				if err != nil {
+					// залогировать
+				}
 			}
 
 			return next(c)
@@ -28,8 +25,11 @@ func CheckUser(bm BotManager) {
 	})
 }
 
-func notExistsUser(bm BotManager, id int64) bool {
-	// возможно стоит возвращать и ошибку,
-	// и записать в лог
-	return !bm.Services().TgUser.CheckTgId(id)
+func unregisteredUser(bm BotManager, id int64) bool {
+	exists, err := bm.Services().TgUser.CheckTgId(id)
+	if err != nil {
+		// bm.LoggerInfo()
+		return false
+	}
+	return !exists
 }

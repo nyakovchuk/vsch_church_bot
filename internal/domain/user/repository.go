@@ -3,15 +3,20 @@ package user
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/doug-martin/goqu/v9"
+	"github.com/nyakovchuk/vsch_church_bot/internal/apperrors"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/tgUser"
 )
 
+const (
+	TelegramUsersTable = "telegram_users"
+	UsersTable         = "users"
+)
+
 type Repository interface {
-	CreateUser(context.Context, tgUser.DtoRepository) error
+	RegisterUser(context.Context, tgUser.DtoRepository) error
 }
 
 type repository struct {
@@ -24,11 +29,11 @@ func NewRepository(db *sql.DB) Repository {
 	}
 }
 
-func (r *repository) CreateUser(ctx context.Context, dtoTgUser tgUser.DtoRepository) error {
+func (r *repository) RegisterUser(ctx context.Context, dtoTgUser tgUser.DtoRepository) error {
 
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
-		return fmt.Errorf("failed to begin transaction: %w", err)
+		return apperrors.Wrap(apperrors.ErrBeginTransaction, err)
 	}
 
 	// Отложенный Rollback с проверкой
@@ -41,15 +46,15 @@ func (r *repository) CreateUser(ctx context.Context, dtoTgUser tgUser.DtoReposit
 
 	tgUserID, err := r.createTelegramUser(ctx, tx, dtoTgUser)
 	if err != nil {
-		return fmt.Errorf("failed to insert telegram user: %w", err)
+		return apperrors.Wrap(apperrors.ErrInsertTelegramUser, err)
 	}
 
 	if err := r.createUser(ctx, tx, tgUserID); err != nil {
-		return fmt.Errorf("failed to insert user: %w", err)
+		return apperrors.Wrap(apperrors.ErrInsertUser, err)
 	}
 
 	if err := tx.Commit(); err != nil {
-		return fmt.Errorf("failed to commit transaction: %w", err)
+		return apperrors.Wrap(apperrors.ErrCommitTransaction, err)
 	}
 	committed = true
 
@@ -57,7 +62,7 @@ func (r *repository) CreateUser(ctx context.Context, dtoTgUser tgUser.DtoReposit
 }
 
 func (r *repository) createTelegramUser(ctx context.Context, tx *sql.Tx, dtoTgUser tgUser.DtoRepository) (int64, error) {
-	ds := goqu.Insert("telegram_users").
+	ds := goqu.Insert(TelegramUsersTable).
 		Rows(goqu.Record{
 			"tg_id":         dtoTgUser.TgID,
 			"username":      dtoTgUser.Username,
@@ -71,20 +76,20 @@ func (r *repository) createTelegramUser(ctx context.Context, tx *sql.Tx, dtoTgUs
 
 	sqlQuery, args, err := ds.ToSQL()
 	if err != nil {
-		return 0, fmt.Errorf("failed to build SQL: %w", err)
+		return 0, apperrors.Wrap(apperrors.ErrBuildSQL, err)
 	}
 
 	var id int64
 	err = tx.QueryRowContext(ctx, sqlQuery, args...).Scan(&id)
 	if err != nil {
-		return 0, fmt.Errorf("failed to execute query: %w", err)
+		return 0, apperrors.Wrap(apperrors.ErrExecuteQuery, err)
 	}
 
 	return id, nil
 }
 
 func (r *repository) createUser(ctx context.Context, tx *sql.Tx, tgUserID int64) error {
-	ds := goqu.Insert("users").
+	ds := goqu.Insert(UsersTable).
 		Rows(goqu.Record{
 			"telegram_users_id": tgUserID,
 			"created_at":        time.Now().UTC(),
@@ -92,12 +97,12 @@ func (r *repository) createUser(ctx context.Context, tx *sql.Tx, tgUserID int64)
 
 	sqlQuery, args, err := ds.ToSQL()
 	if err != nil {
-		return fmt.Errorf("failed to build SQL: %w", err)
+		return apperrors.Wrap(apperrors.ErrBuildSQL, err)
 	}
 
 	_, err = tx.ExecContext(ctx, sqlQuery, args...)
 	if err != nil {
-		return fmt.Errorf("failed to execute query: %w", err)
+		return apperrors.Wrap(apperrors.ErrExecuteQuery, err)
 	}
 
 	return nil
