@@ -17,8 +17,6 @@ func HandleOnLocation(bm BotManager, cache map[string]interface{}, radiusBtn But
 			return c.Send("Не удалось получить геолокацию.")
 		}
 
-		// Добавить тип координат или ontext или onlocation
-
 		// cache["latitude"] = float64(location.Lat)
 		// cache["longitude"] = float64(location.Lng)
 
@@ -29,8 +27,6 @@ func HandleOnLocation(bm BotManager, cache map[string]interface{}, radiusBtn But
 			false,
 		)
 
-		// добавить username
-		// user.SaveCoordinates(ctx, username, coords)
 		savedCoords, err := bm.Services().Coordinates.Save(context.Background(), coords)
 		if err != nil {
 			return c.Send(err.Error())

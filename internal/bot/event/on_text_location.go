@@ -27,8 +27,6 @@ func HandleOnTextLocation(bm BotManager, cache map[string]interface{}, radiusBtn
 
 		_ = fmt.Sprintf("Ваши кординаты: %f, %f", savedCoords.Latitude, savedCoords.Longitude)
 
-		// записать в БД
-		// bm.Services().Coordinates.Create(lat, lon)
 		// cache["latitude"] = savedCoords.Latitude
 		// cache["longitude"] = savedCoords.Longitude
 

@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/tgUser"
 	"gopkg.in/telebot.v4"
@@ -17,7 +16,6 @@ func CheckUser(bm BotManager) {
 				tgUserModel := tgUser.ToModel(user)
 				err := bm.Services().User.Register(context.Background(), tgUserModel)
 				if err != nil {
-					fmt.Println("user check:", err)
 					// залогировать
 				}
 			}
