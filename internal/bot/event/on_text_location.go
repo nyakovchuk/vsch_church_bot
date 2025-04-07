@@ -18,6 +18,7 @@ func HandleOnTextLocation(bm BotManager, cache map[string]interface{}, radiusBtn
 			return c.Send(err.Error())
 		}
 
+		coords.TgUserId = c.Sender().ID
 		coords.IsOnText = true
 		savedCoords, err := bm.Services().Coordinates.Save(context.Background(), coords)
 		if err != nil {

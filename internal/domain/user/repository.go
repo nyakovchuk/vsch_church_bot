@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"database/sql"
-	"time"
 
 	"github.com/doug-martin/goqu/v9"
 	"github.com/nyakovchuk/vsch_church_bot/internal/apperrors"
@@ -91,8 +90,7 @@ func (r *repository) createTelegramUser(ctx context.Context, tx *sql.Tx, dtoTgUs
 func (r *repository) createUser(ctx context.Context, tx *sql.Tx, tgUserID int64) error {
 	ds := goqu.Insert(UsersTable).
 		Rows(goqu.Record{
-			"telegram_users_id": tgUserID,
-			"created_at":        time.Now().UTC(),
+			"tg_user_id": tgUserID,
 		})
 
 	sqlQuery, args, err := ds.ToSQL()

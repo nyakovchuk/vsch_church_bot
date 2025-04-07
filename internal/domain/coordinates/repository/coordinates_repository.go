@@ -42,14 +42,17 @@ func (r *coordinatesRepository) Save(ctx context.Context, coords *dto.Repository
 		}
 	}()
 
-	savedCoords, err := r.createCoordinates(ctx, tx, coords)
+	// если нет координат в user_id - создать
+	// если есть - обновить
+
+	savedCoords, err := r.createOrUpdateCoordinates(ctx, tx, coords)
 	if err != nil {
 		return dto.RepositoryCoordinates{}, apperrors.Wrap(apperrors.ErrInsertCoordinates, err)
 	}
 
 	// сохранить в users coordinates_id
 
-	// Написать ещё два запроса для таблицы user, telegram и coordinates_history,
+	// сохранить координаты в coordinates_history,
 
 	if err := tx.Commit(); err != nil {
 		return dto.RepositoryCoordinates{}, apperrors.Wrap(apperrors.ErrCommitTransaction, err)
@@ -93,14 +96,21 @@ func (r *coordinatesRepository) GetByID(ctx context.Context, id int) (*dto.Repos
 	return &result, nil
 }
 
-func (r *coordinatesRepository) createCoordinates(ctx context.Context, tx *sql.Tx, coords *dto.RepositoryCoordinates) (dto.RepositoryCoordinates, error) {
+func (r *coordinatesRepository) createOrUpdateCoordinates(ctx context.Context, tx *sql.Tx, coords *dto.RepositoryCoordinates) (dto.RepositoryCoordinates, error) {
 	ds := goqu.Insert(CoordinatesTable).
 		Rows(goqu.Record{
+			"tg_user_id": coords.TgUserID,
 			"latitude":   coords.Latitude,
 			"longitude":  coords.Longitude,
 			"is_on_text": coords.IsOnText,
 		}).
-		Returning("id", "latitude", "longitude")
+		OnConflict(goqu.DoUpdate("tg_user_id", goqu.Record{
+			"latitude":   coords.Latitude,
+			"longitude":  coords.Longitude,
+			"is_on_text": coords.IsOnText,
+			"updated_at": time.Now().Format("2006-01-02 15:04:05"),
+		})).
+		Returning("id", "tg_user_id", "latitude", "longitude")
 
 	sqlQuery, args, err := ds.ToSQL()
 	if err != nil {
@@ -111,6 +121,7 @@ func (r *coordinatesRepository) createCoordinates(ctx context.Context, tx *sql.T
 	row := tx.QueryRowContext(ctx, sqlQuery, args...)
 	err = row.Scan(
 		&result.ID,
+		&result.TgUserID,
 		&result.Latitude,
 		&result.Longitude,
 	)

@@ -8,6 +8,7 @@ import (
 
 type RepositoryCoordinates struct {
 	ID        int       `db:"id"`
+	TgUserID  int64     `db:"tg_user_id"`
 	Latitude  float64   `db:"latitude"`
 	Longitude float64   `db:"longitude"`
 	IsOnText  bool      `db:"is_on_text"`
@@ -17,6 +18,7 @@ type RepositoryCoordinates struct {
 func ToModel(repoCoords RepositoryCoordinates) model.Coordinates {
 	return model.Coordinates{
 		ID:        repoCoords.ID,
+		TgUserId:  repoCoords.TgUserID,
 		Latitude:  repoCoords.Latitude,
 		Longitude: repoCoords.Longitude,
 		IsOnText:  repoCoords.IsOnText,

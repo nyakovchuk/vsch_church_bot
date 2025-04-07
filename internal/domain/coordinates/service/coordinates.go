@@ -41,6 +41,7 @@ func (c *coordinatesService) Save(ctx context.Context, coords model.Coordinates)
 	}
 
 	repoDTO := &dto.RepositoryCoordinates{
+		TgUserID:  coords.TgUserId,
 		Latitude:  coords.Latitude,
 		Longitude: coords.Longitude,
 		IsOnText:  coords.IsOnText,
