@@ -3,7 +3,7 @@
 CREATE TABLE languages (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    code TEXT NOT NULL UNIQUE
+    code TEXT UNIQUE NOT NULL
 );
 
 INSERT OR IGNORE INTO languages (name, code) VALUES 

@@ -15,7 +15,7 @@ import (
 const CoordinatesTable = "coordinates"
 
 type CoordinatesRepository interface {
-	Save(context.Context, *dto.RepositoryCoordinates) (*dto.RepositoryCoordinates, error)
+	Save(context.Context, *dto.RepositoryCoordinates) (dto.RepositoryCoordinates, error)
 	GetByID(ctx context.Context, id int) (*dto.RepositoryCoordinates, error)
 }
 
@@ -29,46 +29,38 @@ func NewCoordinatesRepository(db *sql.DB) *coordinatesRepository {
 	}
 }
 
-func (r *coordinatesRepository) Save(ctx context.Context, coords *dto.RepositoryCoordinates) (*dto.RepositoryCoordinates, error) {
-	coords.CreatedAt = time.Now().UTC()
-
-	ds := goqu.Insert(CoordinatesTable).
-		Rows(goqu.Record{
-			"latitude":   coords.Latitude,
-			"longitude":  coords.Longitude,
-			"is_on_text": coords.IsOnText,
-			"created_at": coords.CreatedAt,
-		}).
-		Returning("id")
-
-	sqlQuery, args, err := ds.ToSQL()
+func (r *coordinatesRepository) Save(ctx context.Context, coords *dto.RepositoryCoordinates) (dto.RepositoryCoordinates, error) {
+	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
-		return nil, apperrors.Wrap(apperrors.ErrBuildSQL, err)
+		return dto.RepositoryCoordinates{}, apperrors.Wrap(apperrors.ErrBeginTransaction, err)
+	}
+
+	var committed bool
+	defer func() {
+		if !committed {
+			tx.Rollback()
+		}
+	}()
+
+	// если нет координат в user_id - создать
+	// если есть - обновить
+
+	savedCoords, err := r.createOrUpdateCoordinates(ctx, tx, coords)
+	if err != nil {
+		return dto.RepositoryCoordinates{}, apperrors.Wrap(apperrors.ErrInsertCoordinates, err)
 	}
 
 	// сохранить в users coordinates_id
 
-	// Написать ещё два запроса для таблицы user, telegram и coordinates_history,
-
-	// Выполняем через стандартный sql.DB
-	tx, err := r.db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, apperrors.Wrap(apperrors.ErrBeginTransaction, err)
-	}
-	defer tx.Rollback()
-
-	var id int64
-	err = tx.QueryRowContext(ctx, sqlQuery, args...).Scan(&id)
-	if err != nil {
-		return nil, apperrors.Wrap(apperrors.ErrExecuteQuery, err)
-	}
+	// сохранить координаты в coordinates_history,
 
 	if err := tx.Commit(); err != nil {
-		return nil, apperrors.Wrap(apperrors.ErrCommitTransaction, err)
+		return dto.RepositoryCoordinates{}, apperrors.Wrap(apperrors.ErrCommitTransaction, err)
 	}
+	committed = true
 
-	coords.ID = int(id)
-	return coords, nil
+	return savedCoords, nil
+
 }
 
 func (r *coordinatesRepository) GetByID(ctx context.Context, id int) (*dto.RepositoryCoordinates, error) {
@@ -102,4 +94,40 @@ func (r *coordinatesRepository) GetByID(ctx context.Context, id int) (*dto.Repos
 	}
 
 	return &result, nil
+}
+
+func (r *coordinatesRepository) createOrUpdateCoordinates(ctx context.Context, tx *sql.Tx, coords *dto.RepositoryCoordinates) (dto.RepositoryCoordinates, error) {
+	ds := goqu.Insert(CoordinatesTable).
+		Rows(goqu.Record{
+			"tg_user_id": coords.TgUserID,
+			"latitude":   coords.Latitude,
+			"longitude":  coords.Longitude,
+			"is_on_text": coords.IsOnText,
+		}).
+		OnConflict(goqu.DoUpdate("tg_user_id", goqu.Record{
+			"latitude":   coords.Latitude,
+			"longitude":  coords.Longitude,
+			"is_on_text": coords.IsOnText,
+			"updated_at": time.Now().Format("2006-01-02 15:04:05"),
+		})).
+		Returning("id", "tg_user_id", "latitude", "longitude")
+
+	sqlQuery, args, err := ds.ToSQL()
+	if err != nil {
+		return dto.RepositoryCoordinates{}, apperrors.Wrap(apperrors.ErrBuildSQL, err)
+	}
+
+	var result dto.RepositoryCoordinates
+	row := tx.QueryRowContext(ctx, sqlQuery, args...)
+	err = row.Scan(
+		&result.ID,
+		&result.TgUserID,
+		&result.Latitude,
+		&result.Longitude,
+	)
+	if err != nil {
+		return dto.RepositoryCoordinates{}, apperrors.Wrap(apperrors.ErrExecuteQuery, err)
+	}
+
+	return result, nil
 }

@@ -18,6 +18,7 @@ func HandleOnTextLocation(bm BotManager, cache map[string]interface{}, radiusBtn
 			return c.Send(err.Error())
 		}
 
+		coords.TgUserId = c.Sender().ID
 		coords.IsOnText = true
 		savedCoords, err := bm.Services().Coordinates.Save(context.Background(), coords)
 		if err != nil {
@@ -26,8 +27,6 @@ func HandleOnTextLocation(bm BotManager, cache map[string]interface{}, radiusBtn
 
 		_ = fmt.Sprintf("Ваши кординаты: %f, %f", savedCoords.Latitude, savedCoords.Longitude)
 
-		// записать в БД
-		// bm.Services().Coordinates.Create(lat, lon)
 		// cache["latitude"] = savedCoords.Latitude
 		// cache["longitude"] = savedCoords.Longitude
 
