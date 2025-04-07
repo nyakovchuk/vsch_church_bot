@@ -16,6 +16,7 @@ const (
 
 type Repository interface {
 	RegisterUser(context.Context, tgUser.DtoRepository) error
+	UpdateUserRadius(ctx context.Context, tgUserID int64, radius int) error
 }
 
 type repository struct {
@@ -56,6 +57,25 @@ func (r *repository) RegisterUser(ctx context.Context, dtoTgUser tgUser.DtoRepos
 		return apperrors.Wrap(apperrors.ErrCommitTransaction, err)
 	}
 	committed = true
+
+	return nil
+}
+
+func (r *repository) UpdateUserRadius(ctx context.Context, tgUserID int64, radius int) error {
+
+	ds := goqu.Update(UsersTable).
+		Set(goqu.Record{"radius": radius}).
+		Where(goqu.Ex{"tg_user_id": tgUserID})
+
+	sqlQuery, args, err := ds.ToSQL()
+	if err != nil {
+		return apperrors.Wrap(apperrors.ErrBuildSQL, err)
+	}
+
+	_, err = r.db.ExecContext(ctx, sqlQuery, args...)
+	if err != nil {
+		return apperrors.Wrap(apperrors.ErrExecuteQuery, err)
+	}
 
 	return nil
 }

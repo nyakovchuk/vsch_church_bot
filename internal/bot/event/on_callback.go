@@ -1,6 +1,7 @@
 package event
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -16,20 +17,17 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 
 		radius := getRadius(radiusText)
 
+		// убираем время задержки у кнопок
 		c.Respond()
 
+		err := bm.Services().User.UpdateUserRadius(context.Background(), c.Sender().ID, radius)
+		if err != nil {
+			// залогировать
+			fmt.Println("error update radius:", err)
+			return nil
+		}
+
 		text1 := fmt.Sprintf("Вы выбрали радиус %d км.", radius)
-
-		var lat, lon float64
-		if value, ok := cache["latitude"].(float64); ok {
-			lat = value
-		}
-
-		if value, ok := cache["longitude"].(float64); ok {
-			lon = value
-		}
-
-		fmt.Println("lat:", lat, "lon:", lon)
 
 		// передать координаты в сервис
 		// getNearbyChurches(координаты, радиус)

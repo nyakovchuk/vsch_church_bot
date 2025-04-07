@@ -14,6 +14,8 @@ var (
 	ErrBuildSQL           = errors.New("failed to build SQL")
 	ErrExecuteQuery       = errors.New("failed to execute query")
 	ErrParseTime          = errors.New("failed to parse time")
+	ErrUpdateRadius       = errors.New("failed to update radius")
+	ErrUserRegistration   = errors.New("failed to registration user")
 )
 
 func Wrap(err, wrapper error) error {
