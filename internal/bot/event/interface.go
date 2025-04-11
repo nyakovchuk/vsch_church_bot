@@ -6,6 +6,7 @@ import (
 	"github.com/nyakovchuk/vsch_church_bot/config"
 	"github.com/nyakovchuk/vsch_church_bot/internal/bot/command"
 	"github.com/nyakovchuk/vsch_church_bot/internal/service"
+	"github.com/nyakovchuk/vsch_church_bot/internal/shareddata"
 	"gopkg.in/telebot.v4"
 )
 
@@ -16,6 +17,7 @@ type BotManager interface {
 	LoggerInfo(telebot.Context)
 	Commands() command.Commands
 	Services() *service.Service
+	SharedData() shareddata.Data
 }
 
 type ButtonRenderer interface {

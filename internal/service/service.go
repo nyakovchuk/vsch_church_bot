@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/nyakovchuk/vsch_church_bot/internal/domain/church"
 	coordinates "github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/service"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/tgUser"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/user"
@@ -12,6 +13,7 @@ type Service struct {
 	Distance    coordinates.DistanceService
 	TgUser      tgUser.Service
 	User        user.Service
+	Church      church.Service
 }
 
 func New(repo *repository.Repository) *Service {
@@ -19,10 +21,13 @@ func New(repo *repository.Repository) *Service {
 	coordinatesService := coordinates.NewCoordinatesService(repo.CoordinatesRepository)
 	tgUserService := tgUser.NewService(repo.TgUserRepository)
 	userService := user.NewService(repo.UserRepository)
+	churchService := church.NewService(repo.ChurchRepository)
+
 	return &Service{
 		Distance:    distanceService,
 		Coordinates: coordinatesService,
 		TgUser:      tgUserService,
 		User:        userService,
+		Church:      churchService,
 	}
 }

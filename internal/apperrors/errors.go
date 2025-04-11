@@ -13,9 +13,13 @@ var (
 	ErrCommitTransaction  = errors.New("failed to commit transaction")
 	ErrBuildSQL           = errors.New("failed to build SQL")
 	ErrExecuteQuery       = errors.New("failed to execute query")
+	ErrRowsScan           = errors.New("failed to scan rows")
+	ErrRows               = errors.New("failed to rows")
 	ErrParseTime          = errors.New("failed to parse time")
 	ErrUpdateRadius       = errors.New("failed to update radius")
 	ErrUserRegistration   = errors.New("failed to registration user")
+	ErrChurchGetAll       = errors.New("failed to get all churches")
+	ErrGetUserCoordinates = errors.New("failed to get user coordinates")
 )
 
 func Wrap(err, wrapper error) error {

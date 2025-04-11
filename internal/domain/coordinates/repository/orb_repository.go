@@ -21,6 +21,7 @@ func (c *coordinatesOrbRepository) Distance(p1, p2 model.Coordinates) float64 {
 	p1DTO := dto.ModelToOrb(p1)
 	p2DTO := dto.ModelToOrb(p2)
 
+	// HaversineDistance
 	distance := geo.Distance(p1DTO, p2DTO)
 
 	return distance
