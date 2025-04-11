@@ -31,6 +31,7 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 
 		// передать координаты в сервис
 		// getNearbyChurches(координаты, радиус)
+		// работает универсально или нужно привязываться к пользователю?
 
 		return c.Send(text1)
 	})

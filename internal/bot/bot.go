@@ -10,6 +10,8 @@ import (
 	"github.com/nyakovchuk/vsch_church_bot/internal/bot/ui/menu"
 	"github.com/nyakovchuk/vsch_church_bot/internal/service"
 	"gopkg.in/telebot.v4"
+
+	"github.com/nyakovchuk/vsch_church_bot/internal/shareddata"
 )
 
 type SettingsBot interface {
@@ -18,14 +20,15 @@ type SettingsBot interface {
 }
 
 type Bot struct {
-	bot      *telebot.Bot
-	commands command.CommandManager
-	config   *config.Config
-	logger   *slog.Logger
-	services *service.Service
+	bot        *telebot.Bot
+	commands   command.CommandManager
+	config     *config.Config
+	logger     *slog.Logger
+	services   *service.Service
+	shareddata shareddata.Data
 }
 
-func NewBot(s SettingsBot, commands command.CommandManager, services *service.Service) *Bot {
+func NewBot(s SettingsBot, commands command.CommandManager, services *service.Service, sharedData shareddata.Data) *Bot {
 
 	if s.Config().TelegramBotToken == "" {
 		s.Logger().Error("Retrieving the token", "err", "Token not found in environment variables")
@@ -44,11 +47,12 @@ func NewBot(s SettingsBot, commands command.CommandManager, services *service.Se
 	}
 
 	return &Bot{
-		bot:      bot,
-		commands: commands.Get(),
-		config:   s.Config(),
-		logger:   s.Logger(),
-		services: services,
+		bot:        bot,
+		commands:   commands.Get(),
+		config:     s.Config(),
+		logger:     s.Logger(),
+		services:   services,
+		shareddata: sharedData,
 	}
 }
 
@@ -70,6 +74,10 @@ func (b *Bot) TBot() *telebot.Bot {
 
 func (b *Bot) Services() *service.Service {
 	return b.services
+}
+
+func (b *Bot) SharedData() shareddata.Data {
+	return b.shareddata
 }
 
 func (b *Bot) Run() {
