@@ -16,7 +16,7 @@ const CoordinatesTable = "coordinates"
 
 type CoordinatesRepository interface {
 	Save(context.Context, *dto.RepositoryCoordinates) (dto.RepositoryCoordinates, error)
-	GetByID(ctx context.Context, id int) (*dto.RepositoryCoordinates, error)
+	GetUserId(ctx context.Context, tgUserId int64) (dto.RepositoryCoordinates, error)
 }
 
 type coordinatesRepository struct {
@@ -63,37 +63,28 @@ func (r *coordinatesRepository) Save(ctx context.Context, coords *dto.Repository
 
 }
 
-func (r *coordinatesRepository) GetByID(ctx context.Context, id int) (*dto.RepositoryCoordinates, error) {
+func (r *coordinatesRepository) GetUserId(ctx context.Context, tgUserId int64) (dto.RepositoryCoordinates, error) {
 	ds := goqu.From(CoordinatesTable).
-		Select("id", "latitude", "longitude", "created_at").
-		Where(goqu.C("id").Eq(id)).
+		Select("latitude", "longitude").
+		Where(goqu.C("tg_user_id").Eq(tgUserId)).
 		Limit(1)
 
-	sqlQuery, args, err := ds.ToSQL()
+	query, args, err := ds.Prepared(true).ToSQL()
 	if err != nil {
-		return nil, apperrors.Wrap(apperrors.ErrBuildSQL, err)
+		return dto.RepositoryCoordinates{}, apperrors.Wrap(apperrors.ErrBuildSQL, err)
+	}
+
+	var latitude, longitude float64
+	err = r.db.QueryRowContext(ctx, query, args...).Scan(&latitude, &longitude)
+	if err != nil {
+		return dto.RepositoryCoordinates{}, apperrors.Wrap(apperrors.ErrExecuteQuery, err)
 	}
 
 	var result dto.RepositoryCoordinates
-	var createdAt string
+	result.Latitude = latitude
+	result.Longitude = longitude
 
-	row := r.db.QueryRowContext(ctx, sqlQuery, args...)
-	err = row.Scan(
-		&result.ID,
-		&result.Latitude,
-		&result.Longitude,
-		&createdAt,
-	)
-	if err != nil {
-		return nil, apperrors.Wrap(apperrors.ErrExecuteQuery, err)
-	}
-
-	result.CreatedAt, err = time.Parse("2006-01-02 15:04:05", createdAt)
-	if err != nil {
-		return nil, apperrors.Wrap(apperrors.ErrParseTime, err)
-	}
-
-	return &result, nil
+	return result, nil
 }
 
 func (r *coordinatesRepository) createOrUpdateCoordinates(ctx context.Context, tx *sql.Tx, coords *dto.RepositoryCoordinates) (dto.RepositoryCoordinates, error) {

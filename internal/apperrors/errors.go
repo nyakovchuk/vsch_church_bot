@@ -19,6 +19,7 @@ var (
 	ErrUpdateRadius       = errors.New("failed to update radius")
 	ErrUserRegistration   = errors.New("failed to registration user")
 	ErrChurchGetAll       = errors.New("failed to get all churches")
+	ErrGetUserCoordinates = errors.New("failed to get user coordinates")
 )
 
 func Wrap(err, wrapper error) error {

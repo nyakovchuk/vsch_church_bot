@@ -28,6 +28,17 @@ type Confession struct {
 	Name string
 }
 
+func (c Church) ToTelegramDto() DtoTelegram {
+	return DtoTelegram{
+		Name:       c.NameRu,
+		Alias:      c.Alias,
+		Address:    c.AddressRu,
+		Latitude:   c.Coordinates.Latitude,
+		Longitude:  c.Coordinates.Longitude,
+		Confession: c.Confession.Name,
+	}
+}
+
 func ToModel(dto DtoRepository) Church {
 	return Church{
 		ID:        dto.ID,

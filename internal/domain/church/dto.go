@@ -15,3 +15,13 @@ type DtoRepository struct {
 	ConfessionId   int     `db:"confession_id"`
 	ConfessionName string  `db:"confession_name"`
 }
+
+type DtoTelegram struct {
+	Name       string
+	Alias      string
+	Address    string
+	Latitude   float64
+	Longitude  float64
+	Confession string
+	Distance   float64
+}

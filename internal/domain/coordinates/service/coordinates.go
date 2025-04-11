@@ -22,7 +22,7 @@ var (
 type CoordinatesService interface {
 	ParseCoordinates(string) (model.Coordinates, error)
 	Save(context.Context, model.Coordinates) (model.Coordinates, error)
-	GetCoordinates(context.Context, int) (model.Coordinates, error)
+	GetCoordinates(context.Context, int64) (model.Coordinates, error)
 }
 
 type coordinatesService struct {
@@ -55,13 +55,13 @@ func (c *coordinatesService) Save(ctx context.Context, coords model.Coordinates)
 	return dto.ToModel(repoCoords), nil
 }
 
-func (c *coordinatesService) GetCoordinates(ctx context.Context, id int) (model.Coordinates, error) {
-	repoCoords, err := c.repo.GetByID(ctx, id)
+func (c *coordinatesService) GetCoordinates(ctx context.Context, tgUserId int64) (model.Coordinates, error) {
+	repoCoords, err := c.repo.GetUserId(ctx, tgUserId)
 	if err != nil {
 		return model.Coordinates{}, err
 	}
 
-	return dto.ToModel(*repoCoords), nil
+	return dto.ToModel(repoCoords), nil
 }
 
 func (c *coordinatesService) ParseCoordinates(text string) (model.Coordinates, error) {

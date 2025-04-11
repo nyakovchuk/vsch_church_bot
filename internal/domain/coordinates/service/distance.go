@@ -1,50 +1,61 @@
 package service
 
 import (
-	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/dto"
+	"sort"
+
+	"github.com/nyakovchuk/vsch_church_bot/internal/domain/church"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/model"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/repository"
 )
 
 type DistanceService interface {
-	GetChurchesNearby(latitude, longitude, radius float64) (int, error)
+	GetChurchesNearby(coords model.Coordinates, radius int, churches []church.Church) []church.DtoTelegram
 }
 
 type distanceService struct {
 	repo repository.DistanceRepository
 }
 
-// NewShopService создает новый сервис магазинов.
 func NewDistanceService(repo repository.DistanceRepository) DistanceService {
 	return &distanceService{repo: repo}
 }
 
-func (s *distanceService) GetChurchesNearby(latitude, longitude, radius float64) (int, error) {
+// Шукає найближчі церкви в радіусі Х метрів
+func (s *distanceService) GetChurchesNearby(coords model.Coordinates, radius int, churches []church.Church) []church.DtoTelegram {
 
-	coordinates := dto.CoordinatesToModel(latitude, longitude)
-	if err := coordinates.Validate(); err != nil {
-		return 0, err
+	if err := coords.Validate(); err != nil {
+		return nil
 	}
 
-	// получить координаты церквей (отдельный сервис)
+	findChurches := make([]church.DtoTelegram, 0)
+	for _, church := range churches {
+		churchCoords := model.Coordinates{
+			Latitude:  church.Coordinates.Latitude,
+			Longitude: church.Coordinates.Longitude,
+		}
+		distance := s.distance(coords, churchCoords)
+		if distance <= float64(radius) {
+			churchDtoTg := church.ToTelegramDto()
+			churchDtoTg.Distance = distance
 
-	// churches := make([]string, 10)
-	// // получить расстояние между координатами
-	// for church := range churches {
-	// 	if s.distance(coordinates, church.coordinates) < radius {
+			findChurches = append(findChurches, churchDtoTg)
+		}
+	}
 
-	// 		// добавить церкву в список
-	// 	}
-	// }
-
-	return 0, nil
-
+	return sortByDistance(findChurches)
 }
 
-// GetShopsNearby ищет магазины в радиусе X км.
-func (s *distanceService) distance(coordinates1, coordinates2 model.Coordinates) (float64, error) {
+func (s *distanceService) distance(coordinates1, coordinates2 model.Coordinates) float64 {
 
 	distance := s.repo.Distance(coordinates1, coordinates2)
 
-	return distance, nil
+	return distance
+}
+
+func sortByDistance(churches []church.DtoTelegram) []church.DtoTelegram {
+	sort.Slice(churches, func(i, j int) bool {
+		return churches[i].Distance < churches[j].Distance
+	})
+
+	return churches
 }
