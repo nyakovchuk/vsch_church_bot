@@ -1,7 +1,7 @@
 package logmessage
 
 import (
-	ct "github.com/nyakovchuk/vsch_church_bot/internal/bot/logmessage/commandType"
+	ct "github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/logmessage/commandType"
 	"gopkg.in/telebot.v4"
 )
 

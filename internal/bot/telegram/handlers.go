@@ -1,7 +1,7 @@
-package bot
+package telegram
 
 import (
-	"github.com/nyakovchuk/vsch_church_bot/internal/bot/handler"
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/handler"
 )
 
 func (b *Bot) Handlers() {

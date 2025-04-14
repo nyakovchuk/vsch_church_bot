@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/nyakovchuk/vsch_church_bot/internal/bot/ui/button/reply"
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button/reply"
 	"gopkg.in/telebot.v4"
 )
 

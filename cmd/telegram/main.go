@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/nyakovchuk/vsch_church_bot/internal/bot"
-	"github.com/nyakovchuk/vsch_church_bot/internal/bot/command"
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram"
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/command"
 	"github.com/nyakovchuk/vsch_church_bot/internal/repository"
 	"github.com/nyakovchuk/vsch_church_bot/internal/service"
 	"github.com/nyakovchuk/vsch_church_bot/internal/shareddata"
@@ -32,5 +32,5 @@ func main() {
 	sharedData := shareddata.Data{Churches: churches}
 
 	fmt.Print("Starting the bot...")
-	bot.NewBot(app, cmds, services, sharedData).Run()
+	telegram.NewBot(app, cmds, services, sharedData).Run()
 }

@@ -1,7 +1,7 @@
-package bot
+package telegram
 
 import (
-	"github.com/nyakovchuk/vsch_church_bot/internal/bot/logmessage"
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/logmessage"
 	"gopkg.in/telebot.v4"
 )
 

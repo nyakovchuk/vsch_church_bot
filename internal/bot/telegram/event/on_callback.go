@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/nyakovchuk/vsch_church_bot/internal/bot/ui/button/inline/radiusBtn"
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button/inline/radiusBtn"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/church"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/model"
 	"gopkg.in/telebot.v4"

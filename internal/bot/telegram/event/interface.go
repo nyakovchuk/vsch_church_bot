@@ -4,7 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/nyakovchuk/vsch_church_bot/config"
-	"github.com/nyakovchuk/vsch_church_bot/internal/bot/command"
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/command"
 	"github.com/nyakovchuk/vsch_church_bot/internal/service"
 	"github.com/nyakovchuk/vsch_church_bot/internal/shareddata"
 	"gopkg.in/telebot.v4"

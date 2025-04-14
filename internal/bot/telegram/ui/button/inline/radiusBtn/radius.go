@@ -1,7 +1,7 @@
 package radiusBtn
 
 import (
-	"github.com/nyakovchuk/vsch_church_bot/internal/bot/ui/button"
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button"
 	"gopkg.in/telebot.v4"
 )
 
