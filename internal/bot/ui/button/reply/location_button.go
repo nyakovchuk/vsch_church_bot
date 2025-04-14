@@ -3,7 +3,7 @@ package reply
 import "gopkg.in/telebot.v4"
 
 const (
-	btnText = "📍Отправить геолокацию"
+	btnText = "📍Отправить местоположение"
 )
 
 func BtnLocation() *telebot.ReplyMarkup {

@@ -9,9 +9,8 @@ type Command struct {
 type Commands []Command
 
 var commandList = Commands{
-	{"start", "/start", "Start the bot"},
-	{"help", "/help", "Get the help"},
-	{"reply_btns", "/reply_btns", "Example a reply buttons"},
+	{"start", "/start", "Информация о боте"},
+	{"help", "/help", "Примеры отправки геолокации"},
 }
 
 func GetCommands() CommandManager {
