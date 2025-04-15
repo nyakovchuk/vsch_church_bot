@@ -10,6 +10,7 @@ import (
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/dto"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/model"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/repository"
+	"github.com/nyakovchuk/vsch_church_bot/internal/domain/external"
 )
 
 const coordPattern = `^(-?\d+\.\d+),?\s+(-?\d+\.\d+)$`
@@ -22,7 +23,7 @@ var (
 type CoordinatesService interface {
 	ParseCoordinates(string) (model.Coordinates, error)
 	Save(context.Context, model.Coordinates) (model.Coordinates, error)
-	GetCoordinates(context.Context, int64) (model.Coordinates, error)
+	GetCoordinates(context.Context, external.External) (model.Coordinates, error)
 }
 
 type coordinatesService struct {
@@ -41,10 +42,11 @@ func (c *coordinatesService) Save(ctx context.Context, coords model.Coordinates)
 	}
 
 	repoDTO := &dto.RepositoryCoordinates{
-		TgUserID:  coords.TgUserId,
-		Latitude:  coords.Latitude,
-		Longitude: coords.Longitude,
-		IsOnText:  coords.IsOnText,
+		PlatformID: coords.PlatformID,
+		ExternalID: coords.ExternalID,
+		Latitude:   coords.Latitude,
+		Longitude:  coords.Longitude,
+		IsOnText:   coords.IsOnText,
 	}
 
 	repoCoords, err := c.repo.Save(ctx, repoDTO)
@@ -52,16 +54,18 @@ func (c *coordinatesService) Save(ctx context.Context, coords model.Coordinates)
 		return model.Coordinates{}, err
 	}
 
-	return dto.ToModel(repoCoords), nil
+	return repoCoords.ToModel(), nil
 }
 
-func (c *coordinatesService) GetCoordinates(ctx context.Context, tgUserId int64) (model.Coordinates, error) {
-	repoCoords, err := c.repo.GetUserId(ctx, tgUserId)
+func (c *coordinatesService) GetCoordinates(ctx context.Context, external external.External) (model.Coordinates, error) {
+
+	repoExternal := external.ToRepository()
+	repoCoords, err := c.repo.GetCoordinatesByExternal(ctx, repoExternal)
 	if err != nil {
 		return model.Coordinates{}, err
 	}
 
-	return dto.ToModel(repoCoords), nil
+	return repoCoords.ToModel(), nil
 }
 
 func (c *coordinatesService) ParseCoordinates(text string) (model.Coordinates, error) {
@@ -75,7 +79,7 @@ func (c *coordinatesService) ParseCoordinates(text string) (model.Coordinates, e
 		return model.Coordinates{}, err
 	}
 
-	coordinates := dto.CoordinatesToModel(lat, lon)
+	coordinates := model.GeoToModel(lat, lon)
 	if err := coordinates.Validate(); err != nil {
 		return model.Coordinates{}, err
 	}

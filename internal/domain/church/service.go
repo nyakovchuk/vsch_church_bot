@@ -8,7 +8,6 @@ import (
 
 type Service interface {
 	GetAll(context.Context) ([]Church, error)
-	// GetById(id int) (Church, error)
 }
 
 type service struct {

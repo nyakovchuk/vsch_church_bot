@@ -28,8 +28,8 @@ type Confession struct {
 	Name string
 }
 
-func (c Church) ToTelegramDto() DtoTelegram {
-	return DtoTelegram{
+func (c Church) ToDtoResponse() DtoResponse {
+	return DtoResponse{
 		Name:       c.NameRu,
 		Alias:      c.Alias,
 		Address:    c.AddressRu,
@@ -39,34 +39,10 @@ func (c Church) ToTelegramDto() DtoTelegram {
 	}
 }
 
-func ToModel(dto DtoRepository) Church {
-	return Church{
-		ID:        dto.ID,
-		NameEn:    dto.NameEn,
-		NameRu:    dto.NameRu,
-		Alias:     dto.Alias,
-		AddressRu: dto.AddressRu,
-		Location: Location{
-			CountryRu: dto.CountryRu,
-			CountryId: dto.CountryId,
-			StateId:   dto.StateId,
-			CityId:    dto.CityId,
-		},
-		Coordinates: Coordinates{
-			Latitude:  dto.Latitude,
-			Longitude: dto.Longitude,
-		},
-		Confession: Confession{
-			ID:   dto.ConfessionId,
-			Name: dto.ConfessionName,
-		},
-	}
-}
-
 func ToModels(dtos *[]DtoRepository) []Church {
 	var models []Church
 	for _, dto := range *dtos {
-		models = append(models, ToModel(dto))
+		models = append(models, dto.ToModel())
 	}
 	return models
 }

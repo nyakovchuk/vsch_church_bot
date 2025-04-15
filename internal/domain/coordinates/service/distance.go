@@ -9,7 +9,7 @@ import (
 )
 
 type DistanceService interface {
-	GetChurchesNearby(coords model.Coordinates, radius int, churches []church.Church) []church.DtoTelegram
+	GetChurchesNearby(coords model.Coordinates, radius int, churches []church.Church) []church.DtoResponse
 }
 
 type distanceService struct {
@@ -21,24 +21,25 @@ func NewDistanceService(repo repository.DistanceRepository) DistanceService {
 }
 
 // Шукає найближчі церкви в радіусі Х метрів
-func (s *distanceService) GetChurchesNearby(coords model.Coordinates, radius int, churches []church.Church) []church.DtoTelegram {
+func (s *distanceService) GetChurchesNearby(coords model.Coordinates, radius int, churches []church.Church) []church.DtoResponse {
 
 	if err := coords.Validate(); err != nil {
 		return nil
 	}
 
-	findChurches := make([]church.DtoTelegram, 0)
+	findChurches := make([]church.DtoResponse, 0)
 	for _, church := range churches {
-		churchCoords := model.Coordinates{
-			Latitude:  church.Coordinates.Latitude,
-			Longitude: church.Coordinates.Longitude,
-		}
+		churchCoords := model.GeoToModel(
+			church.Coordinates.Latitude,
+			church.Coordinates.Longitude,
+		)
+
 		distance := s.distance(coords, churchCoords)
 		if distance <= float64(radius) {
-			churchDtoTg := church.ToTelegramDto()
-			churchDtoTg.Distance = distance
+			churchDtoResp := church.ToDtoResponse()
+			churchDtoResp.Distance = distance
 
-			findChurches = append(findChurches, churchDtoTg)
+			findChurches = append(findChurches, churchDtoResp)
 		}
 	}
 
@@ -52,7 +53,7 @@ func (s *distanceService) distance(coordinates1, coordinates2 model.Coordinates)
 	return distance
 }
 
-func sortByDistance(churches []church.DtoTelegram) []church.DtoTelegram {
+func sortByDistance(churches []church.DtoResponse) []church.DtoResponse {
 	sort.Slice(churches, func(i, j int) bool {
 		return churches[i].Distance < churches[j].Distance
 	})

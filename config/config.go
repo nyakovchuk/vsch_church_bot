@@ -18,6 +18,7 @@ type Config struct {
 	LogFilePath      string `env:"LOG_FILE_PATH"`
 	DbDriver         string `env:"DB_DRIVER"`
 	Dsn              string `env:"DSN"`
+	Platform         string `env:"PLATFORM_BOT"`
 }
 
 func LoadConfig() (*Config, error) {

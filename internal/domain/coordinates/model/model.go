@@ -8,20 +8,33 @@ var (
 )
 
 type Coordinates struct {
-	ID        int
-	TgUserId  int64
-	Latitude  float64
-	Longitude float64
-	IsOnText  bool
+	ID         int
+	PlatformID int
+	ExternalID string
+	Latitude   float64
+	Longitude  float64
+	IsOnText   bool
 }
 
-func ToCoordinates(tgUserId int64, latitude, longitude float64, isOnText bool) Coordinates {
+func ToCoordinates(platformId int, externalId string, latitude, longitude float64, isOnText bool) Coordinates {
 	return Coordinates{
-		TgUserId:  tgUserId,
-		Latitude:  latitude,
-		Longitude: longitude,
-		IsOnText:  isOnText,
+		PlatformID: platformId,
+		ExternalID: externalId,
+		Latitude:   latitude,
+		Longitude:  longitude,
+		IsOnText:   isOnText,
 	}
+}
+
+func GeoToModel(lat, lon float64) Coordinates {
+	return Coordinates{
+		Latitude:  lat,
+		Longitude: lon,
+	}
+}
+
+func ModelToGeo(coords Coordinates) (lat, lon float64) {
+	return coords.Latitude, coords.Longitude
 }
 
 func (c *Coordinates) Validate() error {
