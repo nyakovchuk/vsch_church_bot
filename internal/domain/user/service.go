@@ -4,12 +4,13 @@ import (
 	"context"
 
 	"github.com/nyakovchuk/vsch_church_bot/internal/apperrors"
-	"github.com/nyakovchuk/vsch_church_bot/internal/domain/tgUser"
+	"github.com/nyakovchuk/vsch_church_bot/internal/domain/external"
 )
 
 type Service interface {
-	Register(context.Context, tgUser.TgUser) error
-	UpdateUserRadius(ctx context.Context, tgUserID int64, radius int) error
+	Register(ctx context.Context, platformId int, user User) error
+	UpdateUserRadius(ctx context.Context, external external.External, radius int) error
+	IsRegistered(platformId int, externalId string) (bool, error)
 }
 
 type service struct {
@@ -22,20 +23,35 @@ func NewService(repository Repository) Service {
 	}
 }
 
-func (s *service) Register(ctx context.Context, modelTgUser tgUser.TgUser) error {
+func (s *service) Register(ctx context.Context, platformId int, user User) error {
 
-	repoTgUserDto := tgUser.ModelToDto(modelTgUser)
+	repoUserDto := ToDto(user)
+	repoUserDto.PlatformID = platformId
 
-	if err := s.repo.RegisterUser(ctx, repoTgUserDto); err != nil {
+	if err := s.repo.RegisterUser(ctx, repoUserDto); err != nil {
 		return apperrors.Wrap(apperrors.ErrUserRegistration, err)
 	}
 
 	return nil
 }
 
-func (s *service) UpdateUserRadius(ctx context.Context, tgUserID int64, radius int) error {
+func (s *service) IsRegistered(platformId int, externalId string) (bool, error) {
+	exist, err := s.repo.IsRegistered(platformId, externalId)
+	if err != nil {
+		return false, err
+	}
 
-	if err := s.repo.UpdateUserRadius(ctx, tgUserID, radius); err != nil {
+	if !exist {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func (s *service) UpdateUserRadius(ctx context.Context, external external.External, radius int) error {
+
+	repoExternal := external.ToRepository()
+	if err := s.repo.UpdateUserRadius(ctx, repoExternal, radius); err != nil {
 		return apperrors.Wrap(apperrors.ErrUpdateRadius, err)
 	}
 

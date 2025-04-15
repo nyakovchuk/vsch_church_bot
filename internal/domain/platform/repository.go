@@ -30,6 +30,8 @@ func (r *repository) GetByName(ctx context.Context, name string) (DtoRepository,
 	query, args, err := goqu.From(PlatformsTable).
 		Select("id", "name").
 		Where(goqu.C("name").Eq(name)).
+		Limit(1).
+		Prepared(true).
 		ToSQL()
 	if err != nil {
 		return DtoRepository{}, apperrors.Wrap(apperrors.ErrBuildSQL, err)

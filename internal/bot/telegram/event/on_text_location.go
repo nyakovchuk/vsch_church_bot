@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/nyakovchuk/vsch_church_bot/utils"
 	"gopkg.in/telebot.v4"
 )
 
@@ -18,7 +19,9 @@ func HandleOnTextLocation(bm BotManager, cache map[string]interface{}, radiusBtn
 			return c.Send(err.Error())
 		}
 
-		coords.TgUserId = c.Sender().ID
+		externalId := utils.Int64ToString(c.Sender().ID)
+		coords.ExternalID = externalId
+		coords.PlatformID = bm.SharedData().Platform.ID
 		coords.IsOnText = true
 		savedCoords, err := bm.Services().Coordinates.Save(context.Background(), coords)
 		if err != nil {

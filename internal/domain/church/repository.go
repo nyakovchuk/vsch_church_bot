@@ -8,6 +8,10 @@ import (
 	"github.com/nyakovchuk/vsch_church_bot/internal/apperrors"
 )
 
+const (
+	ChurchesTable = "churches"
+)
+
 type Repository interface {
 	GetAll(context.Context) ([]DtoRepository, error)
 }
@@ -23,7 +27,7 @@ func NewRepository(db *sql.DB) Repository {
 }
 
 func (r *repository) GetAll(ctx context.Context) ([]DtoRepository, error) {
-	ds := goqu.From("churches").As("ch").
+	ds := goqu.From(ChurchesTable).
 		Select(
 			"churches.id",
 			"churches.name_ru",
@@ -45,7 +49,7 @@ func (r *repository) GetAll(ctx context.Context) ([]DtoRepository, error) {
 		).
 		Where(goqu.I("churches.is_hidden").Eq(0))
 
-	query, args, err := ds.Prepared(true).ToSQL()
+	query, args, err := ds.ToSQL()
 	if err != nil {
 		return nil, apperrors.Wrap(apperrors.ErrBuildSQL, err)
 	}

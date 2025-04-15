@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/model"
+	"github.com/nyakovchuk/vsch_church_bot/utils"
 	"gopkg.in/telebot.v4"
 )
 
@@ -19,9 +20,10 @@ func HandleOnLocation(bm BotManager, cache map[string]interface{}, radiusBtn But
 
 		// cache["latitude"] = float64(location.Lat)
 		// cache["longitude"] = float64(location.Lng)
-
+		externalId := utils.Int64ToString(c.Sender().ID)
 		coords := model.ToCoordinates(
-			c.Sender().ID,
+			bm.SharedData().Platform.ID,
+			externalId,
 			float64(location.Lat),
 			float64(location.Lng),
 			false,

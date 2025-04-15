@@ -6,17 +6,17 @@ import (
 
 	"github.com/doug-martin/goqu/v9"
 	"github.com/nyakovchuk/vsch_church_bot/internal/apperrors"
-	"github.com/nyakovchuk/vsch_church_bot/internal/domain/tgUser"
+	"github.com/nyakovchuk/vsch_church_bot/internal/domain/external"
 )
 
 const (
-	TelegramUsersTable = "telegram_users"
-	UsersTable         = "users"
+	UsersTable = "users"
 )
 
 type Repository interface {
-	RegisterUser(context.Context, tgUser.DtoRepository) error
-	UpdateUserRadius(ctx context.Context, tgUserID int64, radius int) error
+	IsRegistered(platformId int, externalId string) (bool, error)
+	RegisterUser(context.Context, DtoRepository) error
+	UpdateUserRadius(ctx context.Context, external external.ExternalRepository, radius int) error
 }
 
 type repository struct {
@@ -29,7 +29,21 @@ func NewRepository(db *sql.DB) Repository {
 	}
 }
 
-func (r *repository) RegisterUser(ctx context.Context, dtoTgUser tgUser.DtoRepository) error {
+func (r *repository) IsRegistered(platformId int, externalId string) (bool, error) {
+	var exists bool
+	err := r.db.QueryRow(
+		"SELECT EXISTS(SELECT 1 FROM users WHERE platform_id = ? AND external_id = ? LIMIT 1)",
+		platformId, externalId,
+	).Scan(&exists)
+
+	if err != nil {
+		return false, apperrors.Wrap(apperrors.ErrExecuteQuery, err)
+	}
+
+	return exists, nil
+}
+
+func (r *repository) RegisterUser(ctx context.Context, dtoUser DtoRepository) error {
 
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -44,12 +58,7 @@ func (r *repository) RegisterUser(ctx context.Context, dtoTgUser tgUser.DtoRepos
 		}
 	}()
 
-	tgUserID, err := r.createTelegramUser(ctx, tx, dtoTgUser)
-	if err != nil {
-		return apperrors.Wrap(apperrors.ErrInsertTelegramUser, err)
-	}
-
-	if err := r.createUser(ctx, tx, tgUserID); err != nil {
+	if err := r.createUser(ctx, tx, dtoUser); err != nil {
 		return apperrors.Wrap(apperrors.ErrInsertUser, err)
 	}
 
@@ -61,11 +70,11 @@ func (r *repository) RegisterUser(ctx context.Context, dtoTgUser tgUser.DtoRepos
 	return nil
 }
 
-func (r *repository) UpdateUserRadius(ctx context.Context, tgUserID int64, radius int) error {
+func (r *repository) UpdateUserRadius(ctx context.Context, external external.ExternalRepository, radius int) error {
 
 	ds := goqu.Update(UsersTable).
 		Set(goqu.Record{"radius": radius}).
-		Where(goqu.Ex{"tg_user_id": tgUserID})
+		Where(goqu.Ex{"platform_id": external.PlatformID, "external_id": external.ID})
 
 	sqlQuery, args, err := ds.ToSQL()
 	if err != nil {
@@ -80,40 +89,20 @@ func (r *repository) UpdateUserRadius(ctx context.Context, tgUserID int64, radiu
 	return nil
 }
 
-func (r *repository) createTelegramUser(ctx context.Context, tx *sql.Tx, dtoTgUser tgUser.DtoRepository) (int64, error) {
-	ds := goqu.Insert(TelegramUsersTable).
+func (r *repository) createUser(ctx context.Context, tx *sql.Tx, dtoUser DtoRepository) error {
+	sqlQuery, args, err := goqu.
+		Insert(UsersTable).
 		Rows(goqu.Record{
-			"tg_id":         dtoTgUser.TgID,
-			"username":      dtoTgUser.Username,
-			"first_name":    dtoTgUser.FirstName,
-			"last_name":     dtoTgUser.LastName,
-			"language_code": dtoTgUser.LanguageCode,
-			"is_bot":        dtoTgUser.IsBot,
-			"is_premium":    dtoTgUser.IsPremium,
+			"platform_id":   dtoUser.PlatformID,
+			"external_id":   dtoUser.ExternalID,
+			"username":      dtoUser.Username,
+			"first_name":    dtoUser.FirstName,
+			"last_name":     dtoUser.LastName,
+			"language_code": dtoUser.LanguageCode,
+			"is_bot":        dtoUser.IsBot,
+			"is_premium":    dtoUser.IsPremium,
 		}).
-		Returning("tg_id")
-
-	sqlQuery, args, err := ds.ToSQL()
-	if err != nil {
-		return 0, apperrors.Wrap(apperrors.ErrBuildSQL, err)
-	}
-
-	var id int64
-	err = tx.QueryRowContext(ctx, sqlQuery, args...).Scan(&id)
-	if err != nil {
-		return 0, apperrors.Wrap(apperrors.ErrExecuteQuery, err)
-	}
-
-	return id, nil
-}
-
-func (r *repository) createUser(ctx context.Context, tx *sql.Tx, tgUserID int64) error {
-	ds := goqu.Insert(UsersTable).
-		Rows(goqu.Record{
-			"tg_user_id": tgUserID,
-		})
-
-	sqlQuery, args, err := ds.ToSQL()
+		ToSQL()
 	if err != nil {
 		return apperrors.Wrap(apperrors.ErrBuildSQL, err)
 	}

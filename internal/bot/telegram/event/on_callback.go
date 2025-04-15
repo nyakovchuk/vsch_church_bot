@@ -8,6 +8,8 @@ import (
 	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button/inline/radiusBtn"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/church"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/model"
+	"github.com/nyakovchuk/vsch_church_bot/internal/domain/external"
+	"github.com/nyakovchuk/vsch_church_bot/utils"
 	"gopkg.in/telebot.v4"
 )
 
@@ -15,20 +17,25 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 	bm.TBot().Handle(telebot.OnCallback, func(c telebot.Context) error {
 		bm.LoggerInfo(c)
 
-		radiusText := strings.TrimSpace(c.Callback().Data)
+		externalId := utils.Int64ToString(c.Sender().ID)
+		external := external.ToModel(
+			externalId,
+			bm.SharedData().Platform,
+		)
 
+		radiusText := strings.TrimSpace(c.Callback().Data)
 		radius := getRadius(radiusText)
 
 		// убираем время задержки у кнопок
 		c.Respond()
 
-		err := bm.Services().User.UpdateUserRadius(context.Background(), c.Sender().ID, radius)
+		err := bm.Services().User.UpdateUserRadius(context.Background(), external, radius)
 		if err != nil {
 			// залогировать
 			return nil
 		}
 
-		userCoords, err := bm.Services().Coordinates.GetCoordinates(context.Background(), c.Sender().ID)
+		userCoords, err := bm.Services().Coordinates.GetCoordinates(context.Background(), external)
 		if err != nil {
 			// залогировать
 			return nil
@@ -76,7 +83,7 @@ func getRadius(key string) int {
 	return radius
 }
 
-func buildChurchesText(userCoords model.Coordinates, church church.DtoTelegram) string {
+func buildChurchesText(userCoords model.Coordinates, church church.DtoResponse) string {
 	vschUrl := fmt.Sprintf("https://www.vsch.org/church/%s", church.Alias)
 	text := fmt.Sprintf("<a href=\"%s\"><b>%s</b></a> (%s) – <b>[%.2f км]</b> <a href=\"https://www.google.com/maps/dir/%v,%v/%v,%v\">маршрут</a>\n", vschUrl, church.Name, church.Confession, church.Distance/1000, userCoords.Latitude, userCoords.Longitude, church.Latitude, church.Longitude)
 	return text

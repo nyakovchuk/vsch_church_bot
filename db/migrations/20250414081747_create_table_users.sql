@@ -13,7 +13,7 @@ CREATE TABLE users (
     is_bot boolean DEFAULT false,
     is_premium boolean DEFAULT false,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (platform_id) REFERENCES platforms(tid)
+    FOREIGN KEY (platform_id) REFERENCES platforms(id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE,
     FOREIGN KEY (lang_id) REFERENCES languages(id)
