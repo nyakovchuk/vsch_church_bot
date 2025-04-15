@@ -29,7 +29,16 @@ func main() {
 	if err != nil {
 		fmt.Println("error getting churches", err)
 	}
-	sharedData := shareddata.Data{Churches: churches}
+
+	platform, err := services.Platform.GetByName(context.Background(), app.Config().Platform)
+	if err != nil {
+		fmt.Println("error getting platform", err)
+	}
+
+	sharedData := shareddata.Data{
+		Churches: churches,
+		Platform: platform,
+	}
 
 	fmt.Print("Starting the bot...")
 	telegram.NewBot(app, cmds, services, sharedData).Run()

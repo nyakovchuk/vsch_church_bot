@@ -5,6 +5,7 @@ import (
 
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/church"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/repository"
+	"github.com/nyakovchuk/vsch_church_bot/internal/domain/platform"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/tgUser"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/user"
 )
@@ -15,6 +16,7 @@ type Repository struct {
 	TgUserRepository      tgUser.Repository
 	UserRepository        user.Repository
 	ChurchRepository      church.Repository
+	PlatformRepository    platform.Repository
 }
 
 func New(db *sql.DB) *Repository {
@@ -24,5 +26,6 @@ func New(db *sql.DB) *Repository {
 		TgUserRepository:      tgUser.NewRepository(db),
 		UserRepository:        user.NewRepository(db),
 		ChurchRepository:      church.NewRepository(db),
+		PlatformRepository:    platform.NewRepository(db),
 	}
 }

@@ -20,6 +20,7 @@ var (
 	ErrUserRegistration   = errors.New("failed to registration user")
 	ErrChurchGetAll       = errors.New("failed to get all churches")
 	ErrGetUserCoordinates = errors.New("failed to get user coordinates")
+	ErrPlatformGet        = errors.New("failed to get platform")
 )
 
 func Wrap(err, wrapper error) error {
