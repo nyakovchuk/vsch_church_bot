@@ -14,6 +14,10 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+const (
+	ConfigFile = ".env"
+)
+
 type App struct {
 	config *config.Config
 	logger *slog.Logger
@@ -50,7 +54,7 @@ func NewApp(config *config.Config, logger *slog.Logger, db *sql.DB) *App {
 func GetApp() *App {
 	once.Do(func() {
 		fmt.Print("Loading configuration...")
-		config, err := config.LoadConfig()
+		config, err := config.LoadConfig(ConfigFile)
 		if err != nil {
 			fmt.Println("Error loading configuration:", err)
 			return

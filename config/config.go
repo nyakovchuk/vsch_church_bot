@@ -21,8 +21,8 @@ type Config struct {
 	Platform         string `env:"PLATFORM_BOT"`
 }
 
-func LoadConfig() (*Config, error) {
-	err := godotenv.Load()
+func LoadConfig(configFile string) (*Config, error) {
+	err := godotenv.Load(configFile)
 	if err != nil {
 		return nil, err
 	}
