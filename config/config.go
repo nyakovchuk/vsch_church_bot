@@ -13,7 +13,7 @@ var (
 )
 
 type Config struct {
-	TelegramBotToken string `env:"TELEGRAM_BOT_TOKEN,notEmpty"`
+	TelegramBotToken string `env:"TELEGRAM_BOT_TOKEN"`
 	LogType          string `env:"LOG_TYPE" envDefault="Screen"`
 	LogFilePath      string `env:"LOG_FILE_PATH"`
 	DbDriver         string `env:"DB_DRIVER"`
