@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/nyakovchuk/vsch_church_bot/internal/apperrors"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/dto"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/model"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/repository"
@@ -51,7 +52,7 @@ func (c *coordinatesService) Save(ctx context.Context, coords model.Coordinates)
 
 	repoCoords, err := c.repo.Save(ctx, repoDTO)
 	if err != nil {
-		return model.Coordinates{}, err
+		return model.Coordinates{}, apperrors.Wrap(apperrors.ErrSaveCoordinates, err)
 	}
 
 	return repoCoords.ToModel(), nil

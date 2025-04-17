@@ -16,7 +16,14 @@ func HandleOnTextLocation(bm BotManager, cache map[string]interface{}, radiusBtn
 
 		coords, err := bm.Services().Coordinates.ParseCoordinates(c.Message().Text)
 		if err != nil {
-			return c.Send(err.Error())
+			errText := `<b>Некорректный формат координат</b>
+Пример правильного формата координат:
+<code>50.4228 30.3145</code> <i>(широта, долгота через пробел)</i>
+<code>50.4228, 30.3145</code> <i>(широта, долгота через запятую)</i>.
+			`
+			return c.Send(errText, &telebot.SendOptions{
+				ParseMode: telebot.ModeHTML,
+			})
 		}
 
 		externalId := utils.Int64ToString(c.Sender().ID)
@@ -25,13 +32,11 @@ func HandleOnTextLocation(bm BotManager, cache map[string]interface{}, radiusBtn
 		coords.IsOnText = true
 		savedCoords, err := bm.Services().Coordinates.Save(context.Background(), coords)
 		if err != nil {
-			return c.Send(err.Error())
+			bm.LoggerError(c, err)
+			return nil
 		}
 
 		_ = fmt.Sprintf("Ваши кординаты: %f, %f", savedCoords.Latitude, savedCoords.Longitude)
-
-		// cache["latitude"] = savedCoords.Latitude
-		// cache["longitude"] = savedCoords.Longitude
 
 		return c.Reply("Найти ближайшие церкви в радиусе:", radiusBtn.Display())
 	})

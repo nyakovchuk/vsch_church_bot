@@ -19,7 +19,7 @@ func CheckUser(bm BotManager) {
 
 				err := bm.Services().User.Register(context.Background(), platformId, userModel)
 				if err != nil {
-					// залогировать
+					bm.LoggerError(c, err)
 				}
 			}
 
