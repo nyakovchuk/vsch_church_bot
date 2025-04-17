@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	ConfigFile = ".env"
+	ConfigFile = ".env.prod"
 )
 
 type App struct {
