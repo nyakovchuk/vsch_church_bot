@@ -1,6 +1,7 @@
 package telegram
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"time"
@@ -80,16 +81,21 @@ func (b *Bot) SharedData() shareddata.Data {
 	return b.shareddata
 }
 
-func (b *Bot) Run() {
+func (b *Bot) Run(ctx context.Context) error {
 
 	menu.Create(b.bot)
-
 	b.Middleware()
-
 	b.Handlers()
-
 	b.Events()
-
 	fmt.Print("DONE\n\n")
-	b.bot.Start()
+
+	go b.bot.Start()
+
+	<-ctx.Done()
+
+	b.logger.Info("Stopping the bot...")
+	fmt.Println("Stopping the bot...")
+	b.bot.Stop()
+
+	return nil
 }

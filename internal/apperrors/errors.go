@@ -21,6 +21,7 @@ var (
 	ErrChurchGetAll       = errors.New("failed to get all churches")
 	ErrGetUserCoordinates = errors.New("failed to get user coordinates")
 	ErrPlatformGet        = errors.New("failed to get platform")
+	ErrSaveCoordinates    = errors.New("failed to save coordinates")
 )
 
 func Wrap(err, wrapper error) error {

@@ -12,6 +12,7 @@ type BotManager interface {
 	Logger() *slog.Logger
 	TBot() *telebot.Bot
 	LoggerInfo(telebot.Context)
+	LoggerError(telebot.Context, error)
 	Services() *service.Service
 	SharedData() shareddata.Data
 }

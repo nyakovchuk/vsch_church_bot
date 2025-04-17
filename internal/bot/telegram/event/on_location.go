@@ -31,11 +31,14 @@ func HandleOnLocation(bm BotManager, cache map[string]interface{}, radiusBtn But
 
 		savedCoords, err := bm.Services().Coordinates.Save(context.Background(), coords)
 		if err != nil {
-			return c.Send(err.Error())
+			bm.LoggerError(c, err)
+			return nil
 		}
 
-		text := fmt.Sprintf("Ваши кординаты: %f, %f", savedCoords.Latitude, savedCoords.Longitude)
-		c.Send(text)
+		text := fmt.Sprintf("Ваши кординаты: <code>%f, %f</code>", savedCoords.Latitude, savedCoords.Longitude)
+		c.Send(text, &telebot.SendOptions{
+			ParseMode: telebot.ModeHTML,
+		})
 
 		return c.Reply("Найти ближайшие церкви в радиусе:", radiusBtn.Display())
 	})

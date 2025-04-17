@@ -31,13 +31,13 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 
 		err := bm.Services().User.UpdateUserRadius(context.Background(), external, radius)
 		if err != nil {
-			// залогировать
+			bm.LoggerError(c, err)
 			return nil
 		}
 
 		userCoords, err := bm.Services().Coordinates.GetCoordinates(context.Background(), external)
 		if err != nil {
-			// залогировать
+			bm.LoggerError(c, err)
 			return nil
 		}
 

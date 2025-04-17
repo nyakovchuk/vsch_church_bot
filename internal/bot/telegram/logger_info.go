@@ -10,3 +10,9 @@ func (b *Bot) LoggerInfo(c telebot.Context) {
 
 	b.logger.Info(m.Data(), "type", m.Command(), "attrs", m.UserInfo())
 }
+
+func (b *Bot) LoggerError(c telebot.Context, err error) {
+	m := logmessage.New(c)
+
+	b.logger.Error(m.Data(), "type", m.Command(), "attrs", m.UserInfo(), "error", err)
+}
