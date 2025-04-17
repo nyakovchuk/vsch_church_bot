@@ -3,7 +3,7 @@ include .env.prod
 LOCAL_BIN:=$(CURDIR)/bin
 
 IMAGE_TELEGRAM=vsch-telegram-bot
-GOOSE_DBSTRING=db.sqlite
+GOOSE_DBSTRING=./db.sqlite
 
 ARGUMENTS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 
@@ -23,7 +23,7 @@ migration-status:
 	$(LOCAL_BIN)/goose -dir $(MIGRATION_DIR) $(DB_DRIVER) status 
 
 migration-up:
-	$(LOCAL_BIN)/goose -dir $(MIGRATION_DIR) $(DB_DRIVER) up
+	$(LOCAL_BIN)/goose -dir $(MIGRATION_DIR) $(DB_DRIVER) $(GOOSE_DBSTRING) up
 
 migration-up-to:
 	$(LOCAL_BIN)/goose -dir $(MIGRATION_DIR) $(DB_DRIVER) up-to $(ARGUMENTS) -v
