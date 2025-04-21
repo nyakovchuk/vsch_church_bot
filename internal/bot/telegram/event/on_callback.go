@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button/inline/radiusBtn"
+	nearestchurches "github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button/inline/nearest_churches"
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button/inline/radius"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/church"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/model"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/external"
@@ -17,45 +18,56 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 	bm.TBot().Handle(telebot.OnCallback, func(c telebot.Context) error {
 		bm.LoggerInfo(c)
 
+		// убираем время задержки у кнопок
+		c.Respond()
+
 		externalId := utils.Int64ToString(c.Sender().ID)
 		external := external.ToModel(
 			externalId,
 			bm.SharedData().Platform,
 		)
 
-		radiusText := strings.TrimSpace(c.Callback().Data)
-		radius := getRadius(radiusText)
+		tgText := ""
+		data := strings.TrimSpace(c.Callback().Data)
 
-		// убираем время задержки у кнопок
-		c.Respond()
+		// Обработка кнопок выбора радиуса
+		if strings.HasPrefix(data, radius.PrefixRadius) {
 
-		err := bm.Services().User.UpdateUserRadius(context.Background(), external, radius)
-		if err != nil {
-			bm.LoggerError(c, err)
-			return nil
+			fmt.Println("radiusText:", data)
+			radius := getRadius(data)
+
+			err := bm.Services().User.UpdateUserRadius(context.Background(), external, radius)
+			if err != nil {
+				bm.LoggerError(c, err)
+				return nil
+			}
+
+			userCoords, err := bm.Services().Coordinates.GetCoordinates(context.Background(), external)
+			if err != nil {
+				bm.LoggerError(c, err)
+				return nil
+			}
+
+			findChurches := bm.Services().Distance.GetChurchesNearby(
+				userCoords,
+				radius,
+				bm.SharedData().Churches,
+			)
+
+			tgText = fmt.Sprintf("⛪ В радиусе <b>%d км</b>,  найдено церквей: <b>%d</b>\n\n", radius/1000, len(findChurches))
+
+			for i, church := range findChurches {
+				tgText += fmt.Sprintf("<b>%d.</b> ", i+1)
+				tgText += buildChurchesText(userCoords, church)
+			}
 		}
 
-		userCoords, err := bm.Services().Coordinates.GetCoordinates(context.Background(), external)
-		if err != nil {
-			bm.LoggerError(c, err)
-			return nil
+		// Обработка кнопки поиска ближайших церквей
+		if strings.HasPrefix(data, nearestchurches.PrefixNearestChurches) {
+			tgText = "⛪ Ваша ближайшая церква:"
 		}
 
-		// работает универсально или нужно привязываться к пользователю?
-		findChurches := bm.Services().Distance.GetChurchesNearby(
-			userCoords,
-			radius,
-			bm.SharedData().Churches,
-		)
-
-		text := fmt.Sprintf("⛪ В радиусе <b>%d км</b>,  найдено церквей: <b>%d</b>\n\n", radius/1000, len(findChurches))
-
-		for i, church := range findChurches {
-			text += fmt.Sprintf("<b>%d.</b> ", i+1)
-			text += buildChurchesText(userCoords, church)
-		}
-
-		return c.Send(text, &telebot.SendOptions{
+		return c.Send(tgText, &telebot.SendOptions{
 			ParseMode:             telebot.ModeHTML,
 			DisableWebPagePreview: true,
 		})
@@ -65,7 +77,7 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 // return radius meters
 func getRadius(key string) int {
 
-	buttons := radiusBtn.NewButtonSet()
+	buttons := radius.NewButtonsMap()
 
 	var radius int
 

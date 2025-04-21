@@ -1,16 +1,15 @@
 package button
 
-import "gopkg.in/telebot.v4"
-
-type Btn struct {
-	Reply   *telebot.ReplyMarkup
-	Buttons map[string]telebot.Btn
+type ButtonConfig struct {
+	Label string
+	Data  string
 }
 
-func NewButtons() *Btn {
-	buttons := make(map[string]telebot.Btn)
-	return &Btn{
-		Reply:   &telebot.ReplyMarkup{},
-		Buttons: buttons,
-	}
+type Button struct {
+	Config ButtonConfig
+}
+
+type ButtonsMap struct {
+	Order   []string
+	Buttons map[string]ButtonConfig
 }
