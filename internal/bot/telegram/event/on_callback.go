@@ -14,6 +14,10 @@ import (
 	"gopkg.in/telebot.v4"
 )
 
+const (
+	TOP3 = 3
+)
+
 func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 	bm.TBot().Handle(telebot.OnCallback, func(c telebot.Context) error {
 		bm.LoggerInfo(c)
@@ -27,51 +31,89 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 			bm.SharedData().Platform,
 		)
 
-		tgText := ""
+		tgHtml := ""
 		data := strings.TrimSpace(c.Callback().Data)
 
 		// Обработка кнопок выбора радиуса
 		if strings.HasPrefix(data, radius.PrefixRadius) {
 
-			fmt.Println("radiusText:", data)
 			radius := getRadius(data)
 
+			// Возможно не нужно нам сохранять радиус в БД
 			err := bm.Services().User.UpdateUserRadius(context.Background(), external, radius)
 			if err != nil {
-				bm.LoggerError(c, err)
 				return nil
 			}
 
-			userCoords, err := bm.Services().Coordinates.GetCoordinates(context.Background(), external)
+			html, err := searchChurchesByRadius(bm, external, radius)
 			if err != nil {
 				bm.LoggerError(c, err)
 				return nil
 			}
-
-			findChurches := bm.Services().Distance.GetChurchesNearby(
-				userCoords,
-				radius,
-				bm.SharedData().Churches,
-			)
-
-			tgText = fmt.Sprintf("⛪ В радиусе <b>%d км</b>,  найдено церквей: <b>%d</b>\n\n", radius/1000, len(findChurches))
-
-			for i, church := range findChurches {
-				tgText += fmt.Sprintf("<b>%d.</b> ", i+1)
-				tgText += buildChurchesText(userCoords, church)
-			}
+			tgHtml = html
 		}
 
 		// Обработка кнопки поиска ближайших церквей
 		if strings.HasPrefix(data, nearestchurches.PrefixNearestChurches) {
-			tgText = "⛪ Ваша ближайшая церква:"
+
+			topN := TOP3
+
+			html, err := findTopNNearestChurches(bm, external, topN)
+			if err != nil {
+				bm.LoggerError(c, err)
+				return nil
+			}
+			tgHtml = html
 		}
 
-		return c.Send(tgText, &telebot.SendOptions{
+		return c.Send(tgHtml, &telebot.SendOptions{
 			ParseMode:             telebot.ModeHTML,
 			DisableWebPagePreview: true,
 		})
 	})
+}
+
+func searchChurchesByRadius(bm BotManager, external external.External, radius int) (string, error) {
+	userCoords, err := bm.Services().Coordinates.GetCoordinates(context.Background(), external)
+	if err != nil {
+		return "", err
+	}
+
+	findChurches := bm.Services().Distance.GetChurchesNearby(
+		userCoords,
+		radius,
+		bm.SharedData().Churches,
+	)
+
+	html := fmt.Sprintf("⛪ В радиусе <b>%d км</b>,  найдено церквей: <b>%d</b>\n\n", radius/1000, len(findChurches))
+
+	for i, church := range findChurches {
+		html += fmt.Sprintf("<b>%d.</b> ", i+1)
+		html += buildChurchesText(userCoords, church)
+	}
+
+	return html, nil
+}
+
+func findTopNNearestChurches(bm BotManager, external external.External, topN int) (string, error) {
+	userCoords, err := bm.Services().Coordinates.GetCoordinates(context.Background(), external)
+	if err != nil {
+		return "", err
+	}
+
+	findChurches := bm.Services().Distance.FindTopNNearestChurches(
+		userCoords,
+		topN,
+		bm.SharedData().Churches,
+	)
+
+	html := "⛪ Ближайшие церкви:\n\n"
+	for i, church := range findChurches {
+		html += fmt.Sprintf("<b>%d.</b> ", i+1)
+		html += buildChurchesText(userCoords, church)
+	}
+
+	return html, nil
 }
 
 // return radius meters

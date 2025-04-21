@@ -10,6 +10,7 @@ import (
 
 type DistanceService interface {
 	GetChurchesNearby(coords model.Coordinates, radius int, churches []church.Church) []church.DtoResponse
+	FindTopNNearestChurches(coords model.Coordinates, topN int, churches []church.Church) []church.DtoResponse
 }
 
 type distanceService struct {
@@ -44,6 +45,59 @@ func (s *distanceService) GetChurchesNearby(coords model.Coordinates, radius int
 	}
 
 	return sortByDistance(findChurches)
+}
+
+func (s *distanceService) FindTopNNearestChurches(coords model.Coordinates, topN int, churches []church.Church) []church.DtoResponse {
+
+	churchesWithDistances := make([]*church.ChurchWithDistance, 0, len(churches))
+	// Вычисляем расстояние для каждой церкви
+	for i := range churches {
+		churchCoords := model.GeoToModel(
+			churches[i].Coordinates.Latitude,
+			churches[i].Coordinates.Longitude,
+		)
+		cwd := &church.ChurchWithDistance{
+			Church:   &churches[i],
+			Distance: s.distance(coords, churchCoords),
+		}
+		churchesWithDistances = append(churchesWithDistances, cwd)
+	}
+
+	// Создаём слайс для топ-N
+	topNChurches := make([]*church.ChurchWithDistance, 0, topN)
+
+	// Поиск топ-N ближайших
+	for i := range churchesWithDistances {
+		c := churchesWithDistances[i]
+
+		// Вставка на нужную позицию
+		inserted := false
+		for j := 0; j < len(topNChurches); j++ {
+			if c.Distance < topNChurches[j].Distance {
+				topNChurches = append(topNChurches[:j+1], topNChurches[j:]...)
+				topNChurches[j] = c
+				inserted = true
+				break
+			}
+		}
+
+		// Если не вставили и ещё есть место — добавляем в конец
+		if !inserted && len(topNChurches) < topN {
+			topNChurches = append(topNChurches, c)
+		}
+
+		// Ограничиваем длину до N
+		if len(topNChurches) > topN {
+			topNChurches = topNChurches[:topN]
+		}
+	}
+
+	findChurches := make([]church.DtoResponse, 0, topN)
+	for _, church := range topNChurches {
+		findChurches = append(findChurches, church.ToDtoResponse())
+	}
+
+	return findChurches
 }
 
 func (s *distanceService) distance(coordinates1, coordinates2 model.Coordinates) float64 {
