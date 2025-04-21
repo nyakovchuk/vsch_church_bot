@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button/inline/radiusBtn"
+	nearestchurches "github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button/inline/nearest_churches"
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button/inline/radius"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/church"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/model"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/external"
@@ -13,9 +14,16 @@ import (
 	"gopkg.in/telebot.v4"
 )
 
+const (
+	TOP3 = 3
+)
+
 func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 	bm.TBot().Handle(telebot.OnCallback, func(c telebot.Context) error {
 		bm.LoggerInfo(c)
+
+		// убираем время задержки у кнопок
+		c.Respond()
 
 		externalId := utils.Int64ToString(c.Sender().ID)
 		external := external.ToModel(
@@ -23,49 +31,95 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 			bm.SharedData().Platform,
 		)
 
-		radiusText := strings.TrimSpace(c.Callback().Data)
-		radius := getRadius(radiusText)
+		tgHtml := ""
+		data := strings.TrimSpace(c.Callback().Data)
 
-		// убираем время задержки у кнопок
-		c.Respond()
+		// Обработка кнопок выбора радиуса
+		if strings.HasPrefix(data, radius.PrefixRadius) {
 
-		err := bm.Services().User.UpdateUserRadius(context.Background(), external, radius)
-		if err != nil {
-			bm.LoggerError(c, err)
-			return nil
+			radius := getRadius(data)
+
+			// Возможно не нужно нам сохранять радиус в БД
+			err := bm.Services().User.UpdateUserRadius(context.Background(), external, radius)
+			if err != nil {
+				return nil
+			}
+
+			html, err := searchChurchesByRadius(bm, external, radius)
+			if err != nil {
+				bm.LoggerError(c, err)
+				return nil
+			}
+			tgHtml = html
 		}
 
-		userCoords, err := bm.Services().Coordinates.GetCoordinates(context.Background(), external)
-		if err != nil {
-			bm.LoggerError(c, err)
-			return nil
+		// Обработка кнопки поиска ближайших церквей
+		if strings.HasPrefix(data, nearestchurches.PrefixNearestChurches) {
+
+			topN := TOP3
+
+			html, err := findTopNNearestChurches(bm, external, topN)
+			if err != nil {
+				bm.LoggerError(c, err)
+				return nil
+			}
+			tgHtml = html
 		}
 
-		// работает универсально или нужно привязываться к пользователю?
-		findChurches := bm.Services().Distance.GetChurchesNearby(
-			userCoords,
-			radius,
-			bm.SharedData().Churches,
-		)
-
-		text := fmt.Sprintf("⛪ В радиусе <b>%d км</b>,  найдено церквей: <b>%d</b>\n\n", radius/1000, len(findChurches))
-
-		for i, church := range findChurches {
-			text += fmt.Sprintf("<b>%d.</b> ", i+1)
-			text += buildChurchesText(userCoords, church)
-		}
-
-		return c.Send(text, &telebot.SendOptions{
+		return c.Send(tgHtml, &telebot.SendOptions{
 			ParseMode:             telebot.ModeHTML,
 			DisableWebPagePreview: true,
 		})
 	})
 }
 
+func searchChurchesByRadius(bm BotManager, external external.External, radius int) (string, error) {
+	userCoords, err := bm.Services().Coordinates.GetCoordinates(context.Background(), external)
+	if err != nil {
+		return "", err
+	}
+
+	findChurches := bm.Services().Distance.GetChurchesNearby(
+		userCoords,
+		radius,
+		bm.SharedData().Churches,
+	)
+
+	html := fmt.Sprintf("⛪ В радиусе <b>%d км</b>,  найдено церквей: <b>%d</b>\n\n", radius/1000, len(findChurches))
+
+	for i, church := range findChurches {
+		html += fmt.Sprintf("<b>%d.</b> ", i+1)
+		html += buildChurchesText(userCoords, church)
+	}
+
+	return html, nil
+}
+
+func findTopNNearestChurches(bm BotManager, external external.External, topN int) (string, error) {
+	userCoords, err := bm.Services().Coordinates.GetCoordinates(context.Background(), external)
+	if err != nil {
+		return "", err
+	}
+
+	findChurches := bm.Services().Distance.FindTopNNearestChurches(
+		userCoords,
+		topN,
+		bm.SharedData().Churches,
+	)
+
+	html := "⛪ Ближайшие церкви:\n\n"
+	for i, church := range findChurches {
+		html += fmt.Sprintf("<b>%d.</b> ", i+1)
+		html += buildChurchesText(userCoords, church)
+	}
+
+	return html, nil
+}
+
 // return radius meters
 func getRadius(key string) int {
 
-	buttons := radiusBtn.NewButtonSet()
+	buttons := radius.NewButtonsMap()
 
 	var radius int
 

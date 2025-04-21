@@ -11,6 +11,11 @@ type Church struct {
 	Confession  Confession
 }
 
+type ChurchWithDistance struct {
+	Church   *Church
+	Distance float64
+}
+
 type Location struct {
 	CountryRu string
 	CountryId int
@@ -36,6 +41,18 @@ func (c Church) ToDtoResponse() DtoResponse {
 		Latitude:   c.Coordinates.Latitude,
 		Longitude:  c.Coordinates.Longitude,
 		Confession: c.Confession.Name,
+	}
+}
+
+func (cwd ChurchWithDistance) ToDtoResponse() DtoResponse {
+	return DtoResponse{
+		Name:       cwd.Church.NameRu,
+		Alias:      cwd.Church.Alias,
+		Address:    cwd.Church.AddressRu,
+		Latitude:   cwd.Church.Coordinates.Latitude,
+		Longitude:  cwd.Church.Coordinates.Longitude,
+		Confession: cwd.Church.Confession.Name,
+		Distance:   cwd.Distance,
 	}
 }
 

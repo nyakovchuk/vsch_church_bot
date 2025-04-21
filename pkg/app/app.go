@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
+	"os"
+	"slices"
 	"sync"
 
 	"github.com/nyakovchuk/vsch_church_bot/config"
@@ -14,9 +16,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-const (
-	ConfigFile = ".env.prod"
-)
+var allowedEnvs = []string{"dev", "prod"}
 
 type App struct {
 	config *config.Config
@@ -54,7 +54,8 @@ func NewApp(config *config.Config, logger *slog.Logger, db *sql.DB) *App {
 func GetApp() *App {
 	once.Do(func() {
 		fmt.Print("Loading configuration...")
-		config, err := config.LoadConfig(ConfigFile)
+		configFile := getConfigFile()
+		config, err := config.LoadConfig(configFile)
 		if err != nil {
 			fmt.Println("Error loading configuration:", err)
 			return
@@ -84,4 +85,13 @@ func GetApp() *App {
 	}
 
 	return instance
+}
+
+func getConfigFile() string {
+	env := os.Getenv("EXT_ENV_FILE")
+
+	if slices.Contains(allowedEnvs, env) {
+		return ".env." + env
+	}
+	return ".env"
 }
