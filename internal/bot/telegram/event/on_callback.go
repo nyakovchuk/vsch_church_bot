@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button/inline/language"
 	nearestchurches "github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button/inline/nearest_churches"
 	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button/inline/radius"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/church"
@@ -66,6 +67,16 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 				return nil
 			}
 			tgHtml = html
+		}
+
+		// Обработка кнопки смены языка
+		if strings.HasPrefix(data, language.PrefixLangCode) {
+
+			langCode := getLangCode(data)
+
+			// сохранить в users -> lang_id
+
+			tgHtml = fmt.Sprintf("Язык изменен на <b>%s</b>", langCode)
 		}
 
 		return c.Send(tgHtml, &telebot.SendOptions{
@@ -143,4 +154,24 @@ func buildChurchesText(userCoords model.Coordinates, church church.DtoResponse) 
 	vschUrl := fmt.Sprintf("https://www.vsch.org/church/%s", church.Alias)
 	text := fmt.Sprintf("<a href=\"%s\"><b>%s</b></a> (%s) – <b>[%.2f км]</b> <a href=\"https://www.google.com/maps/dir/%v,%v/%v,%v\">маршрут</a>\n", vschUrl, church.Name, church.Confession, church.Distance/1000, userCoords.Latitude, userCoords.Longitude, church.Latitude, church.Longitude)
 	return text
+}
+
+func getLangCode(key string) string {
+
+	buttons := language.NewButtonsMap()
+
+	var language string
+
+	switch key {
+	case buttons.Buttons["uk"].Data:
+		language = "uk"
+	case buttons.Buttons["en"].Data:
+		language = "en"
+	case buttons.Buttons["ru"].Data:
+		language = "ru"
+	default:
+		language = "en"
+	}
+
+	return language
 }

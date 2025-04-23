@@ -11,6 +11,7 @@ type Commands []Command
 var commandList = Commands{
 	{"start", "/start", "Информация о боте"},
 	{"help", "/help", "Примеры отправки геолокации"},
+	{"language", "/language", "Сменить язык бота"},
 }
 
 func GetCommands() CommandManager {

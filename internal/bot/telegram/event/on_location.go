@@ -9,7 +9,7 @@ import (
 	"gopkg.in/telebot.v4"
 )
 
-func HandleOnLocation(bm BotManager, cache map[string]interface{}, radiusBtn ButtonRenderer) {
+func HandleOnLocation(bm BotManager, cache map[string]interface{}, buttons ButtonRenderer) {
 	bm.TBot().Handle(telebot.OnLocation, func(c telebot.Context) error {
 		bm.LoggerInfo(c)
 
@@ -40,6 +40,6 @@ func HandleOnLocation(bm BotManager, cache map[string]interface{}, radiusBtn But
 			ParseMode: telebot.ModeHTML,
 		})
 
-		return c.Reply("Найти ближайшие церкви в радиусе:", radiusBtn.Display())
+		return c.Reply("Найти ближайшие церкви в радиусе:", buttons.Display())
 	})
 }

@@ -10,7 +10,7 @@ import (
 
 // Узнать где лучше преобразовівать координаты
 // в сервисе или перед ним
-func HandleOnTextLocation(bm BotManager, cache map[string]interface{}, radiusBtn ButtonRenderer) {
+func HandleOnTextLocation(bm BotManager, cache map[string]interface{}, buttons ButtonRenderer) {
 	bm.TBot().Handle(telebot.OnText, func(c telebot.Context) error {
 		bm.LoggerInfo(c)
 
@@ -38,6 +38,6 @@ func HandleOnTextLocation(bm BotManager, cache map[string]interface{}, radiusBtn
 
 		_ = fmt.Sprintf("Ваши кординаты: %f, %f", savedCoords.Latitude, savedCoords.Longitude)
 
-		return c.Reply("Найти ближайшие церкви в радиусе:", radiusBtn.Display())
+		return c.Reply("Найти ближайшие церкви в радиусе:", buttons.Display())
 	})
 }
