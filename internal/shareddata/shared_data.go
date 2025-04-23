@@ -33,8 +33,6 @@ func New(ctx context.Context, cfg *config.Config, services *service.Service) Dat
 		fmt.Println("error getting churches", err)
 	}
 
-	fmt.Println("languages", languages)
-
 	return Data{
 		Churches:  churches,
 		Platform:  platform,

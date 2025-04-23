@@ -14,9 +14,12 @@ const (
 )
 
 type Repository interface {
+	LanguageId(platformId int, externalId string) (int, error)
+	IsLanguageSelected(platformId int, externalId string) (bool, error)
 	IsRegistered(platformId int, externalId string) (bool, error)
 	RegisterUser(context.Context, DtoRepository) error
 	UpdateUserRadius(ctx context.Context, external external.ExternalRepository, radius int) error
+	UpdateUserLangId(ctx context.Context, external external.ExternalRepository, langId int) error
 }
 
 type repository struct {
@@ -27,6 +30,41 @@ func NewRepository(db *sql.DB) Repository {
 	return &repository{
 		db: db,
 	}
+}
+
+func (r *repository) IsLanguageSelected(platformId int, externalId string) (bool, error) {
+
+	langId, err := r.LanguageId(platformId, externalId)
+	if err != nil {
+		return false, err
+	}
+
+	if langId == 0 {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func (r *repository) LanguageId(platformId int, externalId string) (int, error) {
+	var langId sql.NullInt64
+	err := r.db.QueryRow(
+		"SELECT lang_id FROM users WHERE platform_id = ? AND external_id = ? LIMIT 1",
+		platformId, externalId,
+	).Scan(&langId)
+
+	if err != nil {
+		return 0, apperrors.Wrap(apperrors.ErrExecuteQuery, err)
+	}
+
+	var res int
+	if langId.Valid {
+		res = int(langId.Int64)
+	} else {
+		res = 0
+	}
+
+	return res, nil
 }
 
 func (r *repository) IsRegistered(platformId int, externalId string) (bool, error) {
@@ -108,6 +146,25 @@ func (r *repository) createUser(ctx context.Context, tx *sql.Tx, dtoUser DtoRepo
 	}
 
 	_, err = tx.ExecContext(ctx, sqlQuery, args...)
+	if err != nil {
+		return apperrors.Wrap(apperrors.ErrExecuteQuery, err)
+	}
+
+	return nil
+}
+
+func (r *repository) UpdateUserLangId(ctx context.Context, external external.ExternalRepository, langId int) error {
+
+	ds := goqu.Update(UsersTable).
+		Set(goqu.Record{"lang_id": langId}).
+		Where(goqu.Ex{"platform_id": external.PlatformID, "external_id": external.ID})
+
+	sqlQuery, args, err := ds.ToSQL()
+	if err != nil {
+		return apperrors.Wrap(apperrors.ErrBuildSQL, err)
+	}
+
+	_, err = r.db.ExecContext(ctx, sqlQuery, args...)
 	if err != nil {
 		return apperrors.Wrap(apperrors.ErrExecuteQuery, err)
 	}

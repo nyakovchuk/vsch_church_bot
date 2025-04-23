@@ -11,6 +11,7 @@ import (
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/church"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/model"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/external"
+	domainLanguage "github.com/nyakovchuk/vsch_church_bot/internal/domain/language"
 	"github.com/nyakovchuk/vsch_church_bot/utils"
 	"gopkg.in/telebot.v4"
 )
@@ -23,7 +24,7 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 	bm.TBot().Handle(telebot.OnCallback, func(c telebot.Context) error {
 		bm.LoggerInfo(c)
 
-		fmt.Println("language:", c.Get("lang"))
+		// fmt.Println("language:", c.Get("lang"))
 
 		// убираем время задержки у кнопок
 		c.Respond()
@@ -74,7 +75,17 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 
 			langCode := getLangCode(data)
 
-			// сохранить в users -> lang_id
+			langId := domainLanguage.LanguageList(bm.SharedData().Languages).
+				ByCode(langCode).
+				ID
+
+			err := bm.Services().User.UpdateUserLang(context.Background(), external, langId)
+			if err != nil {
+				bm.LoggerError(c, err)
+				return nil
+			}
+
+			c.Set("lang", langCode)
 
 			tgHtml = fmt.Sprintf("Язык изменен на <b>%s</b>", langCode)
 		}
