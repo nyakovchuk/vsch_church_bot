@@ -22,6 +22,8 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 	bm.TBot().Handle(telebot.OnCallback, func(c telebot.Context) error {
 		bm.LoggerInfo(c)
 
+		fmt.Println("language:", c.Get("lang"))
+
 		// убираем время задержки у кнопок
 		c.Respond()
 
