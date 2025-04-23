@@ -46,22 +46,10 @@ func main() {
 	repo := repository.New(app.DB())
 	services := service.New(repo)
 
-	churches, err := services.Church.GetAll(ctx)
-	if err != nil {
-		fmt.Println("error getting churches", err)
-	}
-
-	platform, err := services.Platform.GetByName(ctx, app.Config().Platform)
-	if err != nil {
-		fmt.Println("error getting platform", err)
-	}
-
-	sharedData := shareddata.Data{
-		Churches: churches,
-		Platform: platform,
-	}
+	sharedData := shareddata.New(ctx, app.Config(), services)
 
 	fmt.Print("Starting the bot...")
+
 	bot := telegram.NewBot(app, cmds, services, sharedData)
 
 	if err := bot.Run(ctx); err != nil {

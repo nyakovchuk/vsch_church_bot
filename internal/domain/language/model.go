@@ -5,3 +5,11 @@ type Language struct {
 	Code string
 	Name string
 }
+
+func ToModels(dtos *[]DtoRepository) []Language {
+	var models []Language
+	for _, dto := range *dtos {
+		models = append(models, dto.ToModel())
+	}
+	return models
+}
