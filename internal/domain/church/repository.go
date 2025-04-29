@@ -41,7 +41,8 @@ func (r *repository) GetAll(ctx context.Context) ([]DtoRepository, error) {
 			"churches.latitude",
 			"churches.longitude",
 			"churches.confession_id",
-			goqu.I("conf.name_ru").As("confession_name"),
+			goqu.I("conf.name_ru").As("confession_name_ru"),
+			goqu.I("conf.name_en").As("confession_name_en"),
 		).
 		Join(
 			goqu.T("confessions").As("conf"),
@@ -76,7 +77,8 @@ func (r *repository) GetAll(ctx context.Context) ([]DtoRepository, error) {
 			&dto.Latitude,
 			&dto.Longitude,
 			&dto.ConfessionId,
-			&dto.ConfessionName,
+			&dto.ConfessionNameRu,
+			&dto.ConfessionNameEn,
 		)
 		if err != nil {
 			return nil, apperrors.Wrap(apperrors.ErrRowsScan, err)

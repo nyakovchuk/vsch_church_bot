@@ -35,8 +35,17 @@ func BuildTextForTopNNearestChurches(userCoords model.Coordinates, churches *[]c
 }
 
 func buildChurchesText(userCoords model.Coordinates, church church.DtoResponse, langCode string) string {
+	var churchName, churchConfession string
+	if langCode == "ru" || langCode == "uk" {
+		churchName = church.NameRU
+		churchConfession = church.ConfessionRu
+	} else {
+		churchName = church.NameEN
+		churchConfession = church.ConfessionEn
+	}
+
 	vschUrl := fmt.Sprintf("https://www.vsch.org/church/%s", church.Alias)
-	html := fmt.Sprintf("<a href=\"%s\"><b>%s</b></a> (%s) – <b>[%.2f км]</b> <a href=\"https://www.google.com/maps/dir/%v,%v/%v,%v\">", vschUrl, church.Name, church.Confession, church.Distance/1000, userCoords.Latitude, userCoords.Longitude, church.Latitude, church.Longitude)
+	html := fmt.Sprintf("<a href=\"%s\"><b>%s</b></a> (%s) – <b>[%.2f км]</b> <a href=\"https://www.google.com/maps/dir/%v,%v/%v,%v\">", vschUrl, churchName, churchConfession, church.Distance/1000, userCoords.Latitude, userCoords.Longitude, church.Latitude, church.Longitude)
 
 	printer := i18n.Printer(langCode)
 	html += printer.Sprintf("event.callback.route")
