@@ -1,6 +1,9 @@
 package model
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 var (
 	ErrCorrectLatitude  = errors.New("некорректная широта (должна быть в диапазоне -90...90)")
@@ -24,6 +27,12 @@ func ToCoordinates(platformId int, externalId string, latitude, longitude float6
 		Longitude:  longitude,
 		IsOnText:   isOnText,
 	}
+}
+
+// Нужен чтобы сохранять в координатах раздилитель точку
+// бывает при переходе на другие языки (uk,ru) координаты разделяются запятой
+func (c Coordinates) ToGeoString() (string, string) {
+	return fmt.Sprintf("%.6f", c.Latitude), fmt.Sprintf("%.6f", c.Longitude)
 }
 
 func GeoToModel(lat, lon float64) Coordinates {

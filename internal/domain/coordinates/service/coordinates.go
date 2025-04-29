@@ -23,6 +23,7 @@ var (
 
 type CoordinatesService interface {
 	ParseCoordinates(string) (model.Coordinates, error)
+	SplitCoordinates(string) (string, string, error)
 	Save(context.Context, model.Coordinates) (model.Coordinates, error)
 	GetCoordinates(context.Context, external.External) (model.Coordinates, error)
 }
@@ -70,7 +71,7 @@ func (c *coordinatesService) GetCoordinates(ctx context.Context, external extern
 }
 
 func (c *coordinatesService) ParseCoordinates(text string) (model.Coordinates, error) {
-	latStr, lonStr, err := splitCoordinates(text)
+	latStr, lonStr, err := c.SplitCoordinates(text)
 	if err != nil {
 		return model.Coordinates{}, err
 	}
@@ -82,13 +83,13 @@ func (c *coordinatesService) ParseCoordinates(text string) (model.Coordinates, e
 
 	coordinates := model.GeoToModel(lat, lon)
 	if err := coordinates.Validate(); err != nil {
-		return model.Coordinates{}, err
+		return coordinates, err
 	}
 
 	return coordinates, nil
 }
 
-func splitCoordinates(input string) (string, string, error) {
+func (c *coordinatesService) SplitCoordinates(input string) (string, string, error) {
 	re := regexp.MustCompile(coordPattern)
 	matches := re.FindStringSubmatch(strings.TrimSpace(input))
 

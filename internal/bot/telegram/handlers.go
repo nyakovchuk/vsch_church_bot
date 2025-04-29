@@ -15,4 +15,5 @@ func (b *Bot) Handlers() {
 	b.bot.Handle(commandStart.Route, handler.HandleStart(b))
 	b.bot.Handle(commandHelp.Route, handler.HandleHelp(b))
 	b.bot.Handle(commandLanguage.Route, handler.HandleLanguage(b, languageBtns))
+	b.bot.Handle("/getdb", handler.HandleGetDB(b))
 }

@@ -2,6 +2,7 @@ package nearestchurches
 
 import (
 	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button"
+	"github.com/nyakovchuk/vsch_church_bot/internal/message/i18n"
 	"gopkg.in/telebot.v4"
 )
 
@@ -9,9 +10,12 @@ const (
 	PrefixNearestChurches = "nearest_churches_"
 )
 
-func NewButtonData() *button.ButtonConfig {
+func NewButtonData(langCode string) *button.ButtonConfig {
+
+	printer := i18n.Printer(langCode)
+
 	return &button.ButtonConfig{
-		Label: "🔎 Показать ближайшие 3 церкви",
+		Label: printer.Sprintf("button.show_nearest_churches"),
 		Data:  PrefixNearestChurches,
 	}
 }
@@ -21,10 +25,10 @@ type NearestChurchesButton struct {
 	ButtonData *button.ButtonConfig
 }
 
-func New() *NearestChurchesButton {
+func New(langCode string) *NearestChurchesButton {
 	return &NearestChurchesButton{
 		IButtons:   button.NewButton(),
-		ButtonData: NewButtonData(),
+		ButtonData: NewButtonData(langCode),
 	}
 }
 

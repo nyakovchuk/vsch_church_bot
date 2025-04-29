@@ -11,8 +11,8 @@ type ChurchSearchOptions struct {
 	nearestChurchesBtn *nearestchurches.NearestChurchesButton
 }
 
-func NewChurchSearchOptions() *ChurchSearchOptions {
-	nearestChurchesButtons := nearestchurches.New()
+func NewChurchSearchOptions(langCode string) *ChurchSearchOptions {
+	nearestChurchesButtons := nearestchurches.New(langCode)
 	radiusButtons := radius.New()
 	return &ChurchSearchOptions{
 		radiusBtns:         radiusButtons,

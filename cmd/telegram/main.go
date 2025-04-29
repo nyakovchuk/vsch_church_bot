@@ -9,6 +9,7 @@ import (
 
 	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram"
 	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/command"
+	"github.com/nyakovchuk/vsch_church_bot/internal/message/i18n"
 	"github.com/nyakovchuk/vsch_church_bot/internal/repository"
 	"github.com/nyakovchuk/vsch_church_bot/internal/service"
 	"github.com/nyakovchuk/vsch_church_bot/internal/shareddata"
@@ -38,6 +39,9 @@ func main() {
 
 		fmt.Println("Bot stopped successfully")
 	}()
+
+	// инициализировать перевод
+	i18n.Init()
 
 	// проверить наличие таблиц в БД
 

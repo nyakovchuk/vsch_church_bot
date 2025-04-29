@@ -2,9 +2,9 @@ package event
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/handler"
 	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button/inline/language"
 	nearestchurches "github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button/inline/nearest_churches"
 	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button/inline/radius"
@@ -12,6 +12,8 @@ import (
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/model"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/external"
 	domainLanguage "github.com/nyakovchuk/vsch_church_bot/internal/domain/language"
+	buildText "github.com/nyakovchuk/vsch_church_bot/internal/message/build_text"
+	"github.com/nyakovchuk/vsch_church_bot/internal/message/i18n"
 	"github.com/nyakovchuk/vsch_church_bot/utils"
 	"gopkg.in/telebot.v4"
 )
@@ -24,8 +26,6 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 	bm.TBot().Handle(telebot.OnCallback, func(c telebot.Context) error {
 		bm.LoggerInfo(c)
 
-		// fmt.Println("language:", c.Get("lang"))
-
 		// убираем время задержки у кнопок
 		c.Respond()
 
@@ -34,6 +34,8 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 			externalId,
 			bm.SharedData().Platform,
 		)
+
+		langCode := c.Get("lang").(string)
 
 		tgHtml := ""
 		data := strings.TrimSpace(c.Callback().Data)
@@ -49,11 +51,14 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 				return nil
 			}
 
-			html, err := searchChurchesByRadius(bm, external, radius)
+			findChurches, userCoords, err := SearchChurchesByRadius(bm, external, radius)
 			if err != nil {
 				bm.LoggerError(c, err)
 				return nil
 			}
+
+			html := buildText.BuildTextForSearchChurchesByRadius(userCoords, &findChurches, radius, langCode)
+
 			tgHtml = html
 		}
 
@@ -62,11 +67,14 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 
 			topN := TOP3
 
-			html, err := findTopNNearestChurches(bm, external, topN)
+			findChurches, userCoords, err := FindTopNNearestChurches(bm, external, topN)
 			if err != nil {
 				bm.LoggerError(c, err)
 				return nil
 			}
+
+			html := buildText.BuildTextForTopNNearestChurches(userCoords, &findChurches, langCode)
+
 			tgHtml = html
 		}
 
@@ -87,7 +95,18 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 
 			c.Set("lang", langCode)
 
-			tgHtml = fmt.Sprintf("Язык изменен на <b>%s</b>", langCode)
+			printer := i18n.Printer(langCode)
+
+			c.Send(
+				printer.Sprintf("event.callback.language_changed_message", langCode),
+				&telebot.SendOptions{
+					ParseMode: telebot.ModeHTML,
+				},
+			)
+
+			c.Send("/start")
+			handleHelp := handler.HandleStart(bm)
+			return handleHelp(c)
 		}
 
 		return c.Send(tgHtml, &telebot.SendOptions{
@@ -95,49 +114,6 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 			DisableWebPagePreview: true,
 		})
 	})
-}
-
-func searchChurchesByRadius(bm BotManager, external external.External, radius int) (string, error) {
-	userCoords, err := bm.Services().Coordinates.GetCoordinates(context.Background(), external)
-	if err != nil {
-		return "", err
-	}
-
-	findChurches := bm.Services().Distance.GetChurchesNearby(
-		userCoords,
-		radius,
-		bm.SharedData().Churches,
-	)
-
-	html := fmt.Sprintf("⛪ В радиусе <b>%d км</b>,  найдено церквей: <b>%d</b>\n\n", radius/1000, len(findChurches))
-
-	for i, church := range findChurches {
-		html += fmt.Sprintf("<b>%d.</b> ", i+1)
-		html += buildChurchesText(userCoords, church)
-	}
-
-	return html, nil
-}
-
-func findTopNNearestChurches(bm BotManager, external external.External, topN int) (string, error) {
-	userCoords, err := bm.Services().Coordinates.GetCoordinates(context.Background(), external)
-	if err != nil {
-		return "", err
-	}
-
-	findChurches := bm.Services().Distance.FindTopNNearestChurches(
-		userCoords,
-		topN,
-		bm.SharedData().Churches,
-	)
-
-	html := "⛪ Ближайшие церкви:\n\n"
-	for i, church := range findChurches {
-		html += fmt.Sprintf("<b>%d.</b> ", i+1)
-		html += buildChurchesText(userCoords, church)
-	}
-
-	return html, nil
 }
 
 // return radius meters
@@ -161,10 +137,34 @@ func getRadius(key string) int {
 	return radius
 }
 
-func buildChurchesText(userCoords model.Coordinates, church church.DtoResponse) string {
-	vschUrl := fmt.Sprintf("https://www.vsch.org/church/%s", church.Alias)
-	text := fmt.Sprintf("<a href=\"%s\"><b>%s</b></a> (%s) – <b>[%.2f км]</b> <a href=\"https://www.google.com/maps/dir/%v,%v/%v,%v\">маршрут</a>\n", vschUrl, church.Name, church.Confession, church.Distance/1000, userCoords.Latitude, userCoords.Longitude, church.Latitude, church.Longitude)
-	return text
+func SearchChurchesByRadius(bm BotManager, external external.External, radius int) ([]church.DtoResponse, model.Coordinates, error) {
+	userCoords, err := bm.Services().Coordinates.GetCoordinates(context.Background(), external)
+	if err != nil {
+		return []church.DtoResponse{}, model.Coordinates{}, err
+	}
+
+	findChurches := bm.Services().Distance.GetChurchesNearby(
+		userCoords,
+		radius,
+		bm.SharedData().Churches,
+	)
+
+	return findChurches, userCoords, nil
+}
+
+func FindTopNNearestChurches(bm BotManager, external external.External, topN int) ([]church.DtoResponse, model.Coordinates, error) {
+	userCoords, err := bm.Services().Coordinates.GetCoordinates(context.Background(), external)
+	if err != nil {
+		return []church.DtoResponse{}, model.Coordinates{}, err
+	}
+
+	findChurches := bm.Services().Distance.FindTopNNearestChurches(
+		userCoords,
+		topN,
+		bm.SharedData().Churches,
+	)
+
+	return findChurches, userCoords, nil
 }
 
 func getLangCode(key string) string {

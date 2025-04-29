@@ -1,8 +1,6 @@
 package middleware
 
 import (
-	"fmt"
-
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/language"
 	"github.com/nyakovchuk/vsch_church_bot/utils"
 	"gopkg.in/telebot.v4"
@@ -23,9 +21,8 @@ func GetLanguage(bm BotManager) {
 
 				langCode = language.LanguageList(bm.SharedData().Languages).ByID(langId).Code
 			}
-			c.Set("lang", langCode)
 
-			fmt.Println("language middleware2:", c.Get("lang"))
+			c.Set("lang", langCode)
 
 			return next(c)
 		}

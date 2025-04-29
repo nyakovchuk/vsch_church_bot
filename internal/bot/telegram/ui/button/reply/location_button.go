@@ -1,15 +1,17 @@
 package reply
 
-import "gopkg.in/telebot.v4"
-
-const (
-	btnText = "📍Отправить местоположение"
+import (
+	"github.com/nyakovchuk/vsch_church_bot/internal/message/i18n"
+	"gopkg.in/telebot.v4"
 )
 
-func BtnLocation() *telebot.ReplyMarkup {
+func BtnLocation(langCode string) *telebot.ReplyMarkup {
 
 	btn := &telebot.ReplyMarkup{ResizeKeyboard: true}
-	btnLocation := btn.Location(btnText)
+
+	printer := i18n.Printer(langCode)
+
+	btnLocation := btn.Location(printer.Sprintf("button.send_location"))
 
 	btn.Reply(btn.Row(btnLocation))
 

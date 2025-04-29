@@ -17,11 +17,11 @@ func NewButtonsMap() *button.ButtonsMap {
 	return &button.ButtonsMap{
 		Order: Order(),
 		Buttons: map[string]button.ButtonConfig{
-			"uk": {Label: "Українська",
+			"uk": {Label: "🇺🇦 Українська",
 				Data: PrefixLangCode + "uk"},
-			"en": {Label: "English",
+			"en": {Label: "🇬🇧 English",
 				Data: PrefixLangCode + "en"},
-			"ru": {Label: "Русский",
+			"ru": {Label: "🇷🇺 Русский",
 				Data: PrefixLangCode + "ru"},
 		},
 	}
