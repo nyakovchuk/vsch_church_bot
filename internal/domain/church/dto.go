@@ -1,29 +1,32 @@
 package church
 
 type DtoRepository struct {
-	ID             int     `db:"id"`
-	NameEn         string  `db:"name_en"`
-	NameRu         string  `db:"name_ru"`
-	Alias          string  `db:"alias"`
-	CountryRu      string  `db:"country_ru"`
-	CountryId      int     `db:"country_id"`
-	StateId        int     `db:"state_id"`
-	CityId         int     `db:"city_id"`
-	AddressRu      string  `db:"address_ru"`
-	Latitude       float64 `db:"latitude"`
-	Longitude      float64 `db:"longitude"`
-	ConfessionId   int     `db:"confession_id"`
-	ConfessionName string  `db:"confession_name"`
+	ID               int     `db:"id"`
+	NameEn           string  `db:"name_en"`
+	NameRu           string  `db:"name_ru"`
+	Alias            string  `db:"alias"`
+	CountryRu        string  `db:"country_ru"`
+	CountryId        int     `db:"country_id"`
+	StateId          int     `db:"state_id"`
+	CityId           int     `db:"city_id"`
+	AddressRu        string  `db:"address_ru"`
+	Latitude         float64 `db:"latitude"`
+	Longitude        float64 `db:"longitude"`
+	ConfessionId     int     `db:"confession_id"`
+	ConfessionNameRu string  `db:"confession_name_ru"`
+	ConfessionNameEn string  `db:"confession_name_en"`
 }
 
 type DtoResponse struct {
-	Name       string
-	Alias      string
-	Address    string
-	Latitude   float64
-	Longitude  float64
-	Confession string
-	Distance   float64
+	NameRU       string
+	NameEN       string
+	Alias        string
+	Address      string
+	Latitude     float64
+	Longitude    float64
+	ConfessionRu string
+	ConfessionEn string
+	Distance     float64
 }
 
 func (dto DtoRepository) ToModel() Church {
@@ -44,8 +47,9 @@ func (dto DtoRepository) ToModel() Church {
 			Longitude: dto.Longitude,
 		},
 		Confession: Confession{
-			ID:   dto.ConfessionId,
-			Name: dto.ConfessionName,
+			ID:     dto.ConfessionId,
+			NameRu: dto.ConfessionNameRu,
+			NameEn: dto.ConfessionNameEn,
 		},
 	}
 }

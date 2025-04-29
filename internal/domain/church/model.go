@@ -29,30 +29,33 @@ type Coordinates struct {
 }
 
 type Confession struct {
-	ID   int
-	Name string
+	ID     int
+	NameRu string
+	NameEn string
 }
 
 func (c Church) ToDtoResponse() DtoResponse {
 	return DtoResponse{
-		Name:       c.NameRu,
-		Alias:      c.Alias,
-		Address:    c.AddressRu,
-		Latitude:   c.Coordinates.Latitude,
-		Longitude:  c.Coordinates.Longitude,
-		Confession: c.Confession.Name,
+		NameRU:       c.NameRu,
+		NameEN:       c.NameEn,
+		Alias:        c.Alias,
+		Latitude:     c.Coordinates.Latitude,
+		Longitude:    c.Coordinates.Longitude,
+		ConfessionRu: c.Confession.NameRu,
+		ConfessionEn: c.Confession.NameEn,
 	}
 }
 
 func (cwd ChurchWithDistance) ToDtoResponse() DtoResponse {
 	return DtoResponse{
-		Name:       cwd.Church.NameRu,
-		Alias:      cwd.Church.Alias,
-		Address:    cwd.Church.AddressRu,
-		Latitude:   cwd.Church.Coordinates.Latitude,
-		Longitude:  cwd.Church.Coordinates.Longitude,
-		Confession: cwd.Church.Confession.Name,
-		Distance:   cwd.Distance,
+		NameRU:       cwd.Church.NameRu,
+		NameEN:       cwd.Church.NameEn,
+		Alias:        cwd.Church.Alias,
+		Latitude:     cwd.Church.Coordinates.Latitude,
+		Longitude:    cwd.Church.Coordinates.Longitude,
+		ConfessionRu: cwd.Church.Confession.NameRu,
+		ConfessionEn: cwd.Church.Confession.NameEn,
+		Distance:     cwd.Distance,
 	}
 }
 

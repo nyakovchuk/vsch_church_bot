@@ -11,3 +11,7 @@ type BotManager interface {
 	TBot() *telebot.Bot
 	LoggerInfo(telebot.Context)
 }
+
+type ButtonRenderer interface {
+	Display() *telebot.ReplyMarkup
+}

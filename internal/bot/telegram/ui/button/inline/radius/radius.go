@@ -17,11 +17,11 @@ func NewButtonsMap() *button.ButtonsMap {
 	return &button.ButtonsMap{
 		Order: Order(),
 		Buttons: map[string]button.ButtonConfig{
-			"five": {Label: "5 км",
+			"five": {Label: "5 km",
 				Data: PrefixRadius + "five"},
-			"ten": {Label: "10 км",
+			"ten": {Label: "10 km",
 				Data: PrefixRadius + "ten"},
-			"thirty": {Label: "30 км",
+			"thirty": {Label: "30 km",
 				Data: PrefixRadius + "thirty"},
 		},
 	}

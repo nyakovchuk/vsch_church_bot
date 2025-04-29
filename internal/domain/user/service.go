@@ -9,8 +9,11 @@ import (
 
 type Service interface {
 	Register(ctx context.Context, platformId int, user User) error
-	UpdateUserRadius(ctx context.Context, external external.External, radius int) error
 	IsRegistered(platformId int, externalId string) (bool, error)
+	IsLanguageSelected(platformId int, externalId string) (bool, error)
+	LanguageId(platformId int, externalId string) (int, error)
+	UpdateUserRadius(ctx context.Context, external external.External, radius int) error
+	UpdateUserLang(ctx context.Context, external external.External, langId int) error
 }
 
 type service struct {
@@ -48,11 +51,43 @@ func (s *service) IsRegistered(platformId int, externalId string) (bool, error) 
 	return true, nil
 }
 
+func (s *service) IsLanguageSelected(platformId int, externalId string) (bool, error) {
+	exist, err := s.repo.IsLanguageSelected(platformId, externalId)
+	if err != nil {
+		return false, err
+	}
+
+	if !exist {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func (s *service) LanguageId(platformId int, externalId string) (int, error) {
+	langId, err := s.repo.LanguageId(platformId, externalId)
+	if err != nil {
+		return 0, err
+	}
+
+	return langId, nil
+}
+
 func (s *service) UpdateUserRadius(ctx context.Context, external external.External, radius int) error {
 
 	repoExternal := external.ToRepository()
 	if err := s.repo.UpdateUserRadius(ctx, repoExternal, radius); err != nil {
 		return apperrors.Wrap(apperrors.ErrUpdateRadius, err)
+	}
+
+	return nil
+}
+
+func (s *service) UpdateUserLang(ctx context.Context, external external.External, langId int) error {
+
+	repoExternal := external.ToRepository()
+	if err := s.repo.UpdateUserLangId(ctx, repoExternal, langId); err != nil {
+		return apperrors.Wrap(apperrors.ErrUpdateLanguage, err)
 	}
 
 	return nil

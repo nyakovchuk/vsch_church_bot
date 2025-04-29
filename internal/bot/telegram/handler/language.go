@@ -5,15 +5,15 @@ import (
 	"gopkg.in/telebot.v4"
 )
 
-func HandleHelp(bm BotManager) func(telebot.Context) error {
+func HandleLanguage(bm BotManager, buttons ButtonRenderer) func(telebot.Context) error {
 	return func(c telebot.Context) error {
 		bm.LoggerInfo(c)
 
 		printer := i18n.Printer(c.Get("lang").(string))
 
-		return c.Send(printer.Sprintf("command.help"), &telebot.SendOptions{
+		return c.Send(printer.Sprintf("command.language"), &telebot.SendOptions{
 			ParseMode:             telebot.ModeHTML,
 			DisableWebPagePreview: true,
-		})
+		}, buttons.Display())
 	}
 }

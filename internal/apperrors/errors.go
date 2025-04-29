@@ -22,6 +22,8 @@ var (
 	ErrGetUserCoordinates = errors.New("failed to get user coordinates")
 	ErrPlatformGet        = errors.New("failed to get platform")
 	ErrSaveCoordinates    = errors.New("failed to save coordinates")
+	ErrLanguageGetAll     = errors.New("failed to get all languages")
+	ErrUpdateLanguage     = errors.New("failed to update language")
 )
 
 func Wrap(err, wrapper error) error {

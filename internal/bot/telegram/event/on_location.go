@@ -2,20 +2,25 @@ package event
 
 import (
 	"context"
-	"fmt"
 
+	options "github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button/inline/churchsearch"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/model"
+	"github.com/nyakovchuk/vsch_church_bot/internal/message/i18n"
 	"github.com/nyakovchuk/vsch_church_bot/utils"
 	"gopkg.in/telebot.v4"
 )
 
-func HandleOnLocation(bm BotManager, cache map[string]interface{}, radiusBtn ButtonRenderer) {
+func HandleOnLocation(bm BotManager, cache map[string]interface{}) {
 	bm.TBot().Handle(telebot.OnLocation, func(c telebot.Context) error {
 		bm.LoggerInfo(c)
 
+		langCode := c.Get("lang").(string)
+
+		printer := i18n.Printer(langCode)
+
 		location := c.Message().Location
 		if location == nil {
-			return c.Send("Не удалось получить геолокацию.")
+			return c.Send(printer.Sprintf("event.location.geolocation_error"))
 		}
 
 		// cache["latitude"] = float64(location.Lat)
@@ -35,11 +40,15 @@ func HandleOnLocation(bm BotManager, cache map[string]interface{}, radiusBtn But
 			return nil
 		}
 
-		text := fmt.Sprintf("Ваши кординаты: <code>%f, %f</code>", savedCoords.Latitude, savedCoords.Longitude)
+		latStr, lngStr := savedCoords.ToGeoString()
+
+		text := printer.Sprintf("event.location.your_coordinates", latStr, lngStr)
 		c.Send(text, &telebot.SendOptions{
 			ParseMode: telebot.ModeHTML,
 		})
 
-		return c.Reply("Найти ближайшие церкви в радиусе:", radiusBtn.Display())
+		churchsearchBtn := options.NewChurchSearchOptions(langCode)
+
+		return c.Reply(printer.Sprintf("event.location.find_churches_in_radius"), churchsearchBtn.Display())
 	})
 }
