@@ -2,8 +2,8 @@ package nearestchurches
 
 import (
 	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button"
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button/inline"
 	"github.com/nyakovchuk/vsch_church_bot/internal/message/i18n"
-	"gopkg.in/telebot.v4"
 )
 
 const (
@@ -21,35 +21,18 @@ func NewButtonData(langCode string) *button.ButtonConfig {
 }
 
 type NearestChurchesButton struct {
-	IButtons   *button.TgBtn
-	ButtonData *button.ButtonConfig
+	*inline.SingleButton
 }
 
 func New(langCode string) *NearestChurchesButton {
 	return &NearestChurchesButton{
-		IButtons:   button.NewButton(),
-		ButtonData: NewButtonData(langCode),
+		SingleButton: &inline.SingleButton{
+			IButtons:   button.NewButton(),
+			ButtonData: NewButtonData(langCode),
+		},
 	}
 }
 
 func (ncb *NearestChurchesButton) Prefix() string {
 	return PrefixNearestChurches
-}
-
-func (ncb *NearestChurchesButton) Display() *telebot.ReplyMarkup {
-
-	btnNearestChurches := ncb.Сreate()
-
-	ncb.IButtons.Reply.Inline(
-		ncb.IButtons.Reply.Row(btnNearestChurches),
-	)
-
-	return ncb.IButtons.Reply
-}
-
-func (ncb *NearestChurchesButton) Сreate() telebot.Btn {
-	return ncb.IButtons.Reply.Data(
-		ncb.ButtonData.Label,
-		ncb.ButtonData.Data,
-	)
 }

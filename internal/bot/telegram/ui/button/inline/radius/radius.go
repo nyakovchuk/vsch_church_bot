@@ -2,7 +2,7 @@ package radius
 
 import (
 	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button"
-	"gopkg.in/telebot.v4"
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button/inline"
 )
 
 const (
@@ -28,39 +28,18 @@ func NewButtonsMap() *button.ButtonsMap {
 }
 
 type RadiusButtons struct {
-	IButtons   *button.TgBtns
-	ButtonsMap *button.ButtonsMap
+	*inline.ManyButtons
 }
 
 func New() *RadiusButtons {
 	return &RadiusButtons{
-		IButtons:   button.NewButtons(),
-		ButtonsMap: NewButtonsMap(),
+		ManyButtons: &inline.ManyButtons{
+			IButtons:   button.NewButtons(),
+			ButtonsMap: NewButtonsMap(),
+		},
 	}
 }
 
 func (rb *RadiusButtons) Prefix() string {
 	return PrefixRadius
-}
-
-func (rb *RadiusButtons) Display() *telebot.ReplyMarkup {
-	row := rb.CreateAll()
-
-	rb.IButtons.Reply.Inline(
-		rb.IButtons.Reply.Row(row...),
-	)
-
-	return rb.IButtons.Reply
-}
-
-func (rb *RadiusButtons) CreateAll() []telebot.Btn {
-	var btns []telebot.Btn
-	for _, key := range rb.ButtonsMap.Order {
-		btn := rb.ButtonsMap.Buttons[key]
-		rb.IButtons.Buttons[key] = rb.IButtons.Reply.Data(btn.Label, btn.Data)
-
-		btns = append(btns, rb.IButtons.Buttons[key])
-	}
-
-	return btns
 }

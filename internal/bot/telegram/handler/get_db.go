@@ -4,9 +4,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/nyakovchuk/vsch_church_bot/internal/message/i18n"
-	"github.com/nyakovchuk/vsch_church_bot/utils"
 	"gopkg.in/telebot.v4"
+)
+
+const (
+	timeFormat                   = "2006-01-02_15-04"
+	messageFileNotFound          = "Файл базы данных не найден."
+	messageFileNotFoundForSqlite = "База данных не sqlite. Файл базы данных не может быть переслан."
 )
 
 func HandleGetDB(bm BotManager) func(telebot.Context) error {
@@ -14,27 +18,25 @@ func HandleGetDB(bm BotManager) func(telebot.Context) error {
 		bm.LoggerInfo(c)
 
 		db_driver := os.Getenv("DB_DRIVER")
-		adminID := os.Getenv("TG_ADMIN_ID")
-		if db_driver == "sqlite" && utils.Int64ToString(c.Sender().ID) == adminID {
+		if db_driver == "sqlite" {
+
 			filePath := os.Getenv("DSN")
 			if _, err := os.Stat(filePath); os.IsNotExist(err) {
-				return c.Send("Файл db.sqlite не найден.")
+				return c.Send(messageFileNotFound)
 			}
-
-			currentDate := time.Now().Format("2006-01-02_15-04")
-			fileName := "db-" + currentDate + ".sqlite"
 
 			return c.Send(&telebot.Document{
 				File:     telebot.FromDisk(filePath),
-				FileName: fileName,
+				FileName: getFileName(),
 			})
 		}
 
-		printer := i18n.Printer(c.Get("lang").(string))
-
-		return c.Send(printer.Sprintf("event.text_location.invalid_coordinates_format"), &telebot.SendOptions{
-			ParseMode:             telebot.ModeHTML,
-			DisableWebPagePreview: true,
-		})
+		return c.Send(messageFileNotFoundForSqlite)
 	}
+}
+
+func getFileName() string {
+	currentDate := time.Now().Format(timeFormat)
+
+	return "db-" + currentDate + ".sqlite"
 }

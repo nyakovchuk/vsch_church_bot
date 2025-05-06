@@ -2,7 +2,7 @@ package language
 
 import (
 	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button"
-	"gopkg.in/telebot.v4"
+	"github.com/nyakovchuk/vsch_church_bot/internal/bot/telegram/ui/button/inline"
 )
 
 const (
@@ -28,39 +28,18 @@ func NewButtonsMap() *button.ButtonsMap {
 }
 
 type LanguageButtons struct {
-	IButtons   *button.TgBtns
-	ButtonsMap *button.ButtonsMap
+	*inline.ManyButtons
 }
 
 func NewButtons() *LanguageButtons {
 	return &LanguageButtons{
-		IButtons:   button.NewButtons(),
-		ButtonsMap: NewButtonsMap(),
+		ManyButtons: &inline.ManyButtons{
+			IButtons:   button.NewButtons(),
+			ButtonsMap: NewButtonsMap(),
+		},
 	}
 }
 
 func (lb *LanguageButtons) Prefix() string {
 	return PrefixLangCode
-}
-
-func (lb *LanguageButtons) Display() *telebot.ReplyMarkup {
-	row := lb.CreateAll()
-
-	lb.IButtons.Reply.Inline(
-		lb.IButtons.Reply.Row(row...),
-	)
-
-	return lb.IButtons.Reply
-}
-
-func (lb *LanguageButtons) CreateAll() []telebot.Btn {
-	var btns []telebot.Btn
-	for _, key := range lb.ButtonsMap.Order {
-		btn := lb.ButtonsMap.Buttons[key]
-		lb.IButtons.Buttons[key] = lb.IButtons.Reply.Data(btn.Label, btn.Data)
-
-		btns = append(btns, lb.IButtons.Buttons[key])
-	}
-
-	return btns
 }
