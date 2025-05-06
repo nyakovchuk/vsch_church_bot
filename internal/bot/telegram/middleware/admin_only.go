@@ -24,7 +24,6 @@ func AdminOnly(next telebot.HandlerFunc) telebot.HandlerFunc {
 }
 
 func isAdmin(userID int64) bool {
-	db_driver := os.Getenv("DB_DRIVER")
 	adminID := os.Getenv("TG_ADMIN_ID")
-	return db_driver == "sqlite" && utils.Int64ToString(userID) == adminID
+	return utils.Int64ToString(userID) == adminID
 }
