@@ -12,6 +12,7 @@ var commandList = Commands{
 	{"start", "/start", "About the Bot"},
 	{"help", "/help", "How to Share Location"},
 	{"language", "/language", "Change Bot Language"},
+	{"churches_count", "/churches_count", "List of countries and the number of churches in each"},
 }
 
 func GetCommands() CommandManager {
