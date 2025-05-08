@@ -6,6 +6,7 @@ import (
 
 	"github.com/nyakovchuk/vsch_church_bot/config"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/church"
+	"github.com/nyakovchuk/vsch_church_bot/internal/domain/country"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/language"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/platform"
 	"github.com/nyakovchuk/vsch_church_bot/internal/service"
@@ -15,6 +16,7 @@ type Data struct {
 	Churches  []church.Church
 	Platform  platform.Platform
 	Languages []language.Language
+	Countries []country.CountryWithChurchesCount
 }
 
 func New(ctx context.Context, cfg *config.Config, services *service.Service) Data {
@@ -30,12 +32,19 @@ func New(ctx context.Context, cfg *config.Config, services *service.Service) Dat
 
 	languages, err := services.Language.GetAll(ctx)
 	if err != nil {
-		fmt.Println("error getting churches", err)
+		fmt.Println("error getting languages", err)
+	}
+
+	countries, err := services.Country.ListCountriesByChurchesCount(ctx)
+	fmt.Printf("%#v\n", countries)
+	if err != nil {
+		fmt.Println("error getting countries", err)
 	}
 
 	return Data{
 		Churches:  churches,
 		Platform:  platform,
 		Languages: languages,
+		Countries: countries,
 	}
 }
