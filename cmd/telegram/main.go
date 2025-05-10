@@ -21,7 +21,7 @@ func main() {
 	defer stop()
 
 	app := app.GetApp()
-	fmt.Printf("Logging mode: %s\n\n", app.Config().LogType)
+	fmt.Printf("\nLogging mode: %s\n\n", app.Config().LogType)
 	// defer app.DB().Close()
 
 	defer func() {

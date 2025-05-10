@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"os"
 	"slices"
+	"strings"
 	"sync"
 
 	"github.com/nyakovchuk/vsch_church_bot/config"
@@ -69,6 +70,8 @@ func GetApp() *App {
 			return
 		}
 		fmt.Println("DONE")
+
+		fmt.Printf("\nDatabase driver: %s\n", strings.ToUpper(config.DbDriver))
 
 		fmt.Print("Connecting to database...")
 		db, err := db.ConnectDB(config)
