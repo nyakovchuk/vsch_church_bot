@@ -8,6 +8,12 @@ import (
 	"golang.org/x/text/message"
 )
 
+const (
+	LangCodeEn = "en"
+	LangCodeUk = "uk"
+	LangCodeRu = "ru"
+)
+
 // Init регистрирует все переводы для поддерживаемых языков
 func Init() {
 	// Английские переводы
@@ -15,6 +21,8 @@ func Init() {
 	message.SetString(en, "command.help", command.EnCommandHelp())
 	message.SetString(en, "command.start", command.EnCommandStart())
 	message.SetString(en, "command.language", command.EnCommandLanguage())
+	message.SetString(en, "command.country_churches_count_title", command.EnCountryChurchesCountTitle())
+	message.SetString(en, "command.more_info_link", command.EnMoreInfoLink())
 	message.SetString(en, "button.send_location", button.EnSendLocation())
 	message.SetString(en, "button.show_nearest_churches", button.EnShowNearestChurches())
 	message.SetString(en, "event.callback.language_changed_message", event.EnLanguageChangedMessage())
@@ -33,6 +41,8 @@ func Init() {
 	message.SetString(uk, "command.help", command.UkCommandHelp())
 	message.SetString(uk, "command.start", command.UkCommandStart())
 	message.SetString(uk, "command.language", command.UkCommandLanguage())
+	message.SetString(uk, "command.country_churches_count_title", command.UkCountryChurchesCountTitle())
+	message.SetString(uk, "command.more_info_link", command.UkMoreInfoLink())
 	message.SetString(uk, "button.send_location", button.UkSendLocation())
 	message.SetString(uk, "button.show_nearest_churches", button.UkShowNearestChurches())
 	message.SetString(uk, "event.callback.language_changed_message", event.UkLanguageChangedMessage())
@@ -51,6 +61,8 @@ func Init() {
 	message.SetString(ru, "command.help", command.RuCommandHelp())
 	message.SetString(ru, "command.start", command.RuCommandStart())
 	message.SetString(ru, "command.language", command.RuCommandLanguage())
+	message.SetString(ru, "command.country_churches_count_title", command.RuCountryChurchesCountTitle())
+	message.SetString(ru, "command.more_info_link", command.RuMoreInfoLink())
 	message.SetString(ru, "button.send_location", button.RuSendLocation())
 	message.SetString(ru, "button.show_nearest_churches", button.RuShowNearestChurches())
 	message.SetString(ru, "event.callback.language_changed_message", event.RuLanguageChangedMessage())

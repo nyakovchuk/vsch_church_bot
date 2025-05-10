@@ -19,7 +19,8 @@ import (
 )
 
 const (
-	TOP3 = 3
+	TOP3      = 3
+	maxMsgLen = 5200 // підібрано експерементально
 )
 
 func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
@@ -109,10 +110,7 @@ func HandleOnCallback(bm BotManager, cache map[string]interface{}) {
 			return handleHelp(c)
 		}
 
-		return c.Send(tgHtml, &telebot.SendOptions{
-			ParseMode:             telebot.ModeHTML,
-			DisableWebPagePreview: true,
-		})
+		return SendLongMessage(bm, c, tgHtml)
 	})
 }
 
@@ -185,4 +183,47 @@ func getLangCode(key string) string {
 	}
 
 	return language
+}
+
+func SendLongMessage(bm BotManager, c telebot.Context, html string) error {
+	if len(html) < maxMsgLen {
+		// якщо текст короткий — просто відправити
+		return c.Send(html, &telebot.SendOptions{
+			ParseMode:             telebot.ModeHTML,
+			DisableWebPagePreview: true,
+		})
+	}
+
+	// якщо довгий — розбити по рядках
+	lines := strings.Split(html, "\n")
+	var chunk string
+	for _, line := range lines {
+		if len(chunk)+len(line)+1 > maxMsgLen {
+			// відправити поточний шматок
+			err := c.Send(chunk, &telebot.SendOptions{
+				ParseMode:             telebot.ModeHTML,
+				DisableWebPagePreview: true,
+			})
+			if err != nil {
+				bm.LoggerError(c, err)
+				return nil
+			}
+			chunk = ""
+		}
+		chunk += line + "\n"
+	}
+
+	// відправити залишок, якщо є
+	if chunk != "" {
+		err := c.Send(chunk, &telebot.SendOptions{
+			ParseMode:             telebot.ModeHTML,
+			DisableWebPagePreview: true,
+		})
+		if err != nil {
+			bm.LoggerError(c, err)
+			return nil
+		}
+	}
+
+	return nil
 }

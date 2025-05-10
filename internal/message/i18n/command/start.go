@@ -2,7 +2,7 @@ package command
 
 func EnCommandStart() string {
 	return `
-<b>Find the nearest churches!</b>
+🔍 <b>Find the nearest churches!</b>
 (Works with a database of over 900 churches from <b><i><a href="https://www.vsch.org">vsch.org</a></i></b>)
 
 Just send your current coordinates or choose a location via geolocation, and the <b>bot will show all churches within your selected radius</b>.
@@ -24,7 +24,7 @@ Just send your current coordinates or choose a location via geolocation, and the
 
 func UkCommandStart() string {
 	return `
-<b>Знайди найближчі церкви!</b>
+🔍 <b>Знайди найближчі церкви!</b>
 (Працює на базі даних церков (> 900) сайту <b><i><a href="https://www.vsch.org">vsch.org</a></i></b>)
 
 Просто надішли свої поточні координати або вибери місце на карті, і <b>бот покаже всі церкви в обраному радіусі</b>.

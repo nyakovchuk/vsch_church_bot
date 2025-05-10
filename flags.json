@@ -1,0 +1,112 @@
+[
+  {
+    "name": "Australia",
+    "id": 159,
+    "flag": "🇦🇺"
+  },
+  {
+    "name": "Azerbaijan",
+    "id": 161,
+    "flag": "🇦🇿"
+  },
+  {
+    "name": "Belarus",
+    "id": 1,
+    "flag": "🇧🇾"
+  },
+  {
+    "name": "Belgium",
+    "id": 158,
+    "flag": "🇧🇪"
+  },
+  {
+    "name": "Canada",
+    "id": 89,
+    "flag": "🇨🇦"
+  },
+  {
+    "name": "Czechia",
+    "id": 156,
+    "flag": "🇨🇿"
+  },
+  {
+    "name": "Estonia",
+    "id": 59,
+    "flag": "🇪🇪"
+  },
+  {
+    "name": "Finland",
+    "id": 151,
+    "flag": "🇫🇮"
+  },
+  {
+    "name": "Germany",
+    "id": 70,
+    "flag": "🇩🇪"
+  },
+  {
+    "name": "Kazakhstan",
+    "id": 154,
+    "flag": "🇰🇿"
+  },
+  {
+    "name": "Kyrgyzstan",
+    "id": 157,
+    "flag": "🇰🇬"
+  },
+  {
+    "name": "Latvia",
+    "id": 116,
+    "flag": "🇱🇻"
+  },
+  {
+    "name": "Lithuania",
+    "id": 62,
+    "flag": "🇱🇹"
+  },
+  {
+    "name": "Moldova",
+    "id": 110,
+    "flag": "🇲🇩"
+  },
+  {
+    "name": "Poland",
+    "id": 155,
+    "flag": "🇵🇱"
+  },
+  {
+    "name": "Romania",
+    "id": 94,
+    "flag": "🇷🇴"
+  },
+  {
+    "name": "Russia",
+    "id": 9,
+    "flag": "🇷🇺"
+  },
+  {
+    "name": "Spain",
+    "id": 153,
+    "flag": "🇪🇸"
+  },
+  {
+    "name": "UK",
+    "id": 152,
+    "flag": "🇬🇧"
+  },
+  {
+    "name": "Ukraine",
+    "id": 12,
+    "flag": "🇺🇦"
+  },
+  {
+    "name": "USA",
+    "id": 4,
+    "flag": "🇺🇸"
+  },
+  {
+    "name": "Uzbekistan",
+    "id": 160,
+    "flag": "🇺🇿"
+  }
+]

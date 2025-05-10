@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/church"
 	coordinates "github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/service"
+	"github.com/nyakovchuk/vsch_church_bot/internal/domain/country"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/language"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/platform"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/user"
@@ -16,6 +17,7 @@ type Service struct {
 	Church      church.Service
 	Platform    platform.Service
 	Language    language.Service
+	Country     country.Service
 }
 
 func New(repo *repository.Repository) *Service {
@@ -25,6 +27,7 @@ func New(repo *repository.Repository) *Service {
 	churchService := church.NewService(repo.ChurchRepository)
 	platformService := platform.NewService(repo.PlatformRepository)
 	languageService := language.NewService(repo.LanguageRepository)
+	countryService := country.NewService(repo.CountryRepository)
 
 	return &Service{
 		Distance:    distanceService,
@@ -33,5 +36,6 @@ func New(repo *repository.Repository) *Service {
 		Church:      churchService,
 		Platform:    platformService,
 		Language:    languageService,
+		Country:     countryService,
 	}
 }
