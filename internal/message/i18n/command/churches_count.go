@@ -1,19 +1,25 @@
 package command
 
-func EnCommandChurchesCount() string {
-	return `
-shows the list of countries and the number of churches in each of them
-`
+func EnCountryChurchesCountTitle() string {
+	return `🌍 <b>Number of Churches by Country</b>`
 }
 
-func UkCommandChurchesCount() string {
-	return `
-показує список країн та кількість церков, що знаходяться в кожній з них.
-`
+func UkCountryChurchesCountTitle() string {
+	return `🌍 <b>Кількість церков за країнами</b>`
 }
 
-func RuCommandChurchesCount() string {
-	return `
-отображает список стран и количество церквей в каждой из них.
-`
+func RuCountryChurchesCountTitle() string {
+	return `🌍 <b>Количество церквей по странам</b>`
+}
+
+func EnMoreInfoLink() string {
+	return `👉 Learn more at <b><a href="https://www.vsch.org/search">vsch.org</a></b>`
+}
+
+func UkMoreInfoLink() string {
+	return `👉 Дізнайтесь більше на <b><a href="https://www.vsch.org/search">vsch.org</a></b>`
+}
+
+func RuMoreInfoLink() string {
+	return `👉 Узнайте больше на <b><a href="https://www.vsch.org/search">vsch.org</a></b>`
 }

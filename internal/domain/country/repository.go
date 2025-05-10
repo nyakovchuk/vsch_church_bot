@@ -3,6 +3,8 @@ package country
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
+	"os"
 
 	"github.com/doug-martin/goqu/v9"
 	"github.com/nyakovchuk/vsch_church_bot/internal/apperrors"
@@ -14,15 +16,18 @@ const (
 
 type Repository interface {
 	ListCountriesByChurchesCount(context.Context) ([]WithChurchesCountDTO, error)
+	GetFlagsFromFile() (map[string]string, error)
 }
 
 type repository struct {
-	db *sql.DB
+	db            *sql.DB
+	filenameFlags string
 }
 
-func NewRepository(db *sql.DB) Repository {
+func NewRepository(db *sql.DB, filenameFlags string) Repository {
 	return &repository{
-		db: db,
+		db:            db,
+		filenameFlags: filenameFlags,
 	}
 }
 
@@ -71,4 +76,31 @@ func (r *repository) ListCountriesByChurchesCount(ctx context.Context) ([]WithCh
 	}
 
 	return countries, nil
+}
+
+func (r *repository) GetFlagsFromFile() (map[string]string, error) {
+	type Country struct {
+		Name string `json:"name"`
+		Flag string `json:"flag"`
+	}
+
+	file, err := os.Open(r.filenameFlags)
+	if err != nil {
+		return nil, apperrors.Wrap(apperrors.ErrOpenFile, err)
+	}
+	defer file.Close()
+
+	// Декодуємо JSON у slice структур
+	var countries []Country
+	if err := json.NewDecoder(file).Decode(&countries); err != nil {
+		return nil, apperrors.Wrap(apperrors.ErrDecodeJSON, err)
+	}
+
+	// Створюємо map: name => flag
+	flagMap := make(map[string]string)
+	for _, country := range countries {
+		flagMap[country.Name] = country.Flag
+	}
+
+	return flagMap, nil
 }

@@ -2,9 +2,11 @@ package build_text
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/church"
 	"github.com/nyakovchuk/vsch_church_bot/internal/domain/coordinates/model"
+	"github.com/nyakovchuk/vsch_church_bot/internal/domain/country"
 	"github.com/nyakovchuk/vsch_church_bot/internal/message/i18n"
 )
 
@@ -36,7 +38,7 @@ func BuildTextForTopNNearestChurches(userCoords model.Coordinates, churches *[]c
 
 func buildChurchesText(userCoords model.Coordinates, church church.DtoResponse, langCode string) string {
 	var churchName, churchConfession string
-	if langCode == "ru" || langCode == "uk" {
+	if langCode == i18n.LangCodeRu || langCode == i18n.LangCodeUk {
 		churchName = church.NameRU
 		churchConfession = church.ConfessionRu
 	} else {
@@ -52,4 +54,50 @@ func buildChurchesText(userCoords model.Coordinates, church church.DtoResponse, 
 	html += "</a>\n"
 
 	return html
+}
+
+func ForCountryWithChurches(countries *[]country.DtoResponse, langCode string) string {
+	printer := i18n.Printer(langCode)
+
+	html := printer.Sprintf("command.country_churches_count_title")
+	html += "\n\n"
+	html += formatCountryStats(countries, langCode)
+	html += "\n"
+	html += printer.Sprintf("command.more_info_link")
+
+	return html
+}
+
+// Формуємо вирівняний HTML-текст
+func formatCountryStats(countries *[]country.DtoResponse, langCode string) string {
+
+	var builder strings.Builder
+
+	maxWidth := maxWidthChurchesCount(countries)
+	for _, country := range *countries {
+		widthCountry := len(fmt.Sprintf("%d", country.ChurchesCount))
+
+		builder.WriteString(fmt.Sprintf("<b>%d</b>", country.ChurchesCount))
+		for i := widthCountry; i <= maxWidth; i++ {
+			builder.WriteString("  ")
+		}
+		builder.WriteString(country.FlagWithName(langCode))
+		builder.WriteString("\n")
+	}
+
+	return builder.String()
+}
+
+// Знаходимо максимальну довжину числа
+func maxWidthChurchesCount(countries *[]country.DtoResponse) int {
+
+	maxWidth := 0
+	for _, country := range *countries {
+		width := len(fmt.Sprintf("%d", country.ChurchesCount))
+		if width > maxWidth {
+			maxWidth = width
+		}
+	}
+
+	return maxWidth
 }

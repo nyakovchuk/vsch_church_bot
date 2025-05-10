@@ -22,6 +22,7 @@ type Repository struct {
 }
 
 func New(db *sql.DB) *Repository {
+	filenameFlags := "flags.json"
 	return &Repository{
 		DistanceRepository:    repository.NewOrbRepository(),
 		CoordinatesRepository: repository.NewCoordinatesRepository(db),
@@ -29,6 +30,6 @@ func New(db *sql.DB) *Repository {
 		ChurchRepository:      church.NewRepository(db),
 		PlatformRepository:    platform.NewRepository(db),
 		LanguageRepository:    language.NewRepository(db),
-		CountryRepository:     country.NewRepository(db),
+		CountryRepository:     country.NewRepository(db, filenameFlags),
 	}
 }
