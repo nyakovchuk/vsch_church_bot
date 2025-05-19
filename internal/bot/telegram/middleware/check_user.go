@@ -21,6 +21,7 @@ func CheckUser(bm BotManager) {
 				if err != nil {
 					bm.LoggerError(c, err)
 				}
+				bm.LoggerMessage(c, "User registered")
 			}
 
 			return next(c)
