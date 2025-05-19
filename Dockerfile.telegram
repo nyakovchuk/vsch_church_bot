@@ -25,4 +25,6 @@ COPY --from=builder /app/.env.prod ./.env.prod
 COPY --from=builder /app/bot.json.log ./bot.json.log
 COPY --from=builder /app/flags.json ./flags.json
 
+EXPOSE 8080
+
 CMD ["./bot"]
