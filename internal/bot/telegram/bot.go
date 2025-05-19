@@ -94,7 +94,6 @@ func (b *Bot) Run(ctx context.Context) error {
 	<-ctx.Done()
 
 	b.logger.Info("Stopping the bot...")
-	fmt.Println("Stopping the bot...")
 	b.bot.Stop()
 
 	return nil

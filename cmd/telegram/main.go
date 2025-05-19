@@ -13,6 +13,7 @@ import (
 	"github.com/nyakovchuk/vsch_church_bot/internal/repository"
 	"github.com/nyakovchuk/vsch_church_bot/internal/service"
 	"github.com/nyakovchuk/vsch_church_bot/internal/shareddata"
+	"github.com/nyakovchuk/vsch_church_bot/internal/webserver"
 	"github.com/nyakovchuk/vsch_church_bot/pkg/app"
 )
 
@@ -38,6 +39,13 @@ func main() {
 		fmt.Println("DONE")
 
 		fmt.Println("Bot stopped successfully")
+	}()
+
+	fmt.Printf("Starting the web server on port: %s\n\n", os.Getenv("WEB_SERVER_PORT"))
+	go func() {
+		if err := webserver.Start(); err != nil {
+			fmt.Println(err)
+		}
 	}()
 
 	// инициализировать перевод
