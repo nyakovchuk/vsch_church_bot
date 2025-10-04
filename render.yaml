@@ -14,12 +14,3 @@ services:
 
     # Health check
     healthCheckPath: /ping
-
-    # Змінні середовища
-    envVars:
-      - key: WEB_SERVER_PORT
-        value: 8080
-      - key: TELEGRAM_TOKEN
-        sync: false
-      - key: TG_ADMIN_ID
-        sync: false
