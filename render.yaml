@@ -12,13 +12,13 @@ services:
     autoDeploy: true
     branch: main
 
-    # PR Previews (окремий деплой для кожного pull request)
-    previews:
-      autoDeploy: true
+    previewsEnabled: true
 
-    # Health Check (перевірка працездатності)
-    healthCheckPath: /ping
-    healthCheckTimeout: 30
+    # Health check
+    healthCheckPath: /health
+    healthCheckIntervalSeconds: 30
+    healthCheckTimeoutSeconds: 10
+    healthCheckFailureThreshold: 3
 
     # Змінні середовища
     envVars:
