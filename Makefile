@@ -30,7 +30,7 @@ migration-status:
 	$(LOCAL_BIN)/goose -dir $(MIGRATION_DIR) $(DB_DRIVER) status 
 
 migration-up:
-	$(LOCAL_BIN)/goose -dir $(MIGRATION_DIR) $(DB_DRIVER) up
+	$(LOCAL_BIN)/goose -dir $(MIGRATION_DIR) $(DB_DRIVER) $(GOOSE_DBSTRING) up
 
 migration-up-to:
 	$(LOCAL_BIN)/goose -dir $(MIGRATION_DIR) $(DB_DRIVER) up-to $(ARGUMENTS) -v
