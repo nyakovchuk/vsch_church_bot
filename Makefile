@@ -7,6 +7,13 @@ GOOSE_DBSTRING=./db.sqlite
 
 ARGUMENTS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 
+build-cmd:
+	go mod download
+	make install-migration
+	make migration-up
+	go mod tidy
+	CGO_ENABLED=1 go build -o bot ./cmd/telegram
+
 build-telegram:
 	docker build -f Dockerfile.telegram -t $(IMAGE_TELEGRAM) .
 
@@ -23,7 +30,7 @@ migration-status:
 	$(LOCAL_BIN)/goose -dir $(MIGRATION_DIR) $(DB_DRIVER) status 
 
 migration-up:
-	$(LOCAL_BIN)/goose -dir $(MIGRATION_DIR) $(DB_DRIVER) $(GOOSE_DBSTRING) up
+	$(LOCAL_BIN)/goose -dir $(MIGRATION_DIR) $(DB_DRIVER) up
 
 migration-up-to:
 	$(LOCAL_BIN)/goose -dir $(MIGRATION_DIR) $(DB_DRIVER) up-to $(ARGUMENTS) -v

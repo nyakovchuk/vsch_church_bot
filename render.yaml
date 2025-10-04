@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: vsch-bot
+    env: go
+    plan: free
+
+    # Побудова та запуск
+    buildCommand: make build-cmd
+    startCommand: ./bot
+
+    # Автодеплой з GitHub (з гілки main)
+    autoDeploy: true
+    branch: main
+
+    # PR Previews (окремий деплой для кожного pull request)
+    previews:
+      autoDeploy: true
+
+    # Health Check (перевірка працездатності)
+    healthCheckPath: /ping
+    healthCheckTimeout: 30
+
+    # Змінні середовища
+    envVars:
+      - key: WEB_SERVER_PORT
+        value: 8080
+      - key: TELEGRAM_TOKEN
+        sync: false
+      - key: TG_ADMIN_ID
+        sync: false
