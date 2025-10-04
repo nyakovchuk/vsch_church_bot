@@ -12,13 +12,8 @@ services:
     autoDeploy: true
     branch: main
 
-    previewsEnabled: true
-
     # Health check
-    healthCheckPath: /health
-    healthCheckIntervalSeconds: 30
-    healthCheckTimeoutSeconds: 10
-    healthCheckFailureThreshold: 3
+    healthCheckPath: /ping
 
     # Змінні середовища
     envVars:
